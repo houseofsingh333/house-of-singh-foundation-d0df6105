@@ -6,7 +6,7 @@ const HomeIntro = () => {
     <section className="px-8 md:px-16 py-24 md:py-32">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
         {/* Portrait */}
-        <div className="aspect-[3/4] overflow-hidden bg-secondary">
+        <div className="aspect-square overflow-hidden bg-secondary">
           <img
             src={portraitImage}
             alt="Maninder Singh — Creative Director, Designer & Photographer"
