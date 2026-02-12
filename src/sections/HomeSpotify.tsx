@@ -1,16 +1,18 @@
-const spotifyUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M";
+import { siteSettings } from "../lib/mock-data";
 
 const HomeSpotify = () => {
   return (
-    <section className="px-6 py-16 max-w-2xl mx-auto text-center">
-      <h2 className="text-2xl font-light tracking-wide text-black mb-8">Listen</h2>
+    <section className="px-8 md:px-16 py-20 md:py-28 max-w-3xl">
+      <p className="text-xs tracking-widest uppercase text-muted-foreground mb-10">
+        Now Playing
+      </p>
       <iframe
-        src={spotifyUrl}
+        src={siteSettings.spotifyPlaylistUrl}
         width="100%"
-        height="380"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        height="152"
+        allow="encrypted-media"
         loading="lazy"
-        className="border-0 rounded"
+        className="border-0 opacity-80 hover:opacity-100 transition-opacity duration-500"
         title="Spotify playlist"
       />
     </section>

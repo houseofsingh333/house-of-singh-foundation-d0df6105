@@ -42,13 +42,16 @@ export interface JournalEntry {
   slug: string;
   publishedAt: string;
   excerpt: string;
-  body: string; // placeholder for portable text
+  body: string;
   coverImage: string;
 }
 
-export interface NewsletterSubscriber {
-  email: string;
-  subscribedAt: string;
+export interface SpotlightProject {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  image: string;
 }
 
 export interface SiteSettings {
@@ -57,26 +60,27 @@ export interface SiteSettings {
   homeHeroMode: "slider" | "static";
 }
 
-// --- Navigation (Studio removed from public nav) ---
+// --- Navigation (includes Studio as external) ---
 export const navigation: NavItem[] = [
   { label: "Home", internalRoute: "/", order: 1 },
   { label: "About", internalRoute: "/about", order: 2 },
   { label: "Projects", internalRoute: "/projects", order: 3 },
   { label: "Journal", internalRoute: "/journal", order: 4 },
-  { label: "Contact", internalRoute: "/contact", order: 5 },
+  { label: "Studio", externalUrl: "https://studios.houseofsingh.com", order: 5 },
+  { label: "Contact", internalRoute: "/contact", order: 6 },
 ];
 
 // --- Hero Slides ---
 export const heroSlides: HeroSlide[] = [
-  { _id: "1", image: "/placeholder.svg", caption: "Slide One", internalLink: "/projects", order: 1 },
-  { _id: "2", image: "/placeholder.svg", caption: "Slide Two", externalLink: "https://studios.houseofsingh.com", order: 2 },
-  { _id: "3", image: "/placeholder.svg", caption: "Slide Three", order: 3 },
+  { _id: "1", image: "/placeholder.svg", caption: "Between light and structure", internalLink: "/about", order: 1 },
+  { _id: "2", image: "/placeholder.svg", caption: "Quiet observations", internalLink: "/projects/project-alpha", order: 2 },
+  { _id: "3", image: "/placeholder.svg", caption: "A slow archive", order: 3 },
 ];
 
 // --- Project Categories ---
 export const projectCategories: ProjectCategory[] = [
-  { _id: "cat1", title: "Design", slug: "design", order: 1 },
-  { _id: "cat2", title: "Photography", slug: "photography", order: 2 },
+  { _id: "cat1", title: "Photography", slug: "photography", order: 1 },
+  { _id: "cat2", title: "Design", slug: "design", order: 2 },
   { _id: "cat3", title: "Collaborations", slug: "collaborations", order: 3 },
 ];
 
@@ -84,13 +88,13 @@ export const projectCategories: ProjectCategory[] = [
 export const projects: Project[] = [
   {
     _id: "p1", title: "Project Alpha", slug: "project-alpha",
-    category: projectCategories[0], year: 2024, featured: true,
+    category: projectCategories[1], year: 2024, featured: true,
     description: "Placeholder description for Project Alpha.",
     gallery: [{ src: "/placeholder.svg", alt: "Alpha image 1" }],
   },
   {
     _id: "p2", title: "Project Beta", slug: "project-beta",
-    category: projectCategories[1], year: 2023, featured: false,
+    category: projectCategories[0], year: 2023, featured: false,
     description: "Placeholder description for Project Beta.",
     gallery: [{ src: "/placeholder.svg", alt: "Beta image 1" }],
   },
@@ -108,7 +112,16 @@ export const projects: Project[] = [
   },
 ];
 
-// --- Journal Entries (upgraded schema) ---
+// --- Spotlight ---
+export const spotlightProject: SpotlightProject = {
+  _id: "sp1",
+  title: "The Weight of Stillness",
+  slug: "project-alpha",
+  description: "A photographic study on the interplay of silence and architecture. Shot across three cities over two years.",
+  image: "/placeholder.svg",
+};
+
+// --- Journal Entries ---
 export const journalEntries: JournalEntry[] = [
   { _id: "j1", title: "Exploring Light", slug: "exploring-light", publishedAt: "2024-11-15T10:00:00Z", excerpt: "A short excerpt about exploring light in photography.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
   { _id: "j2", slug: "2024-10-20", publishedAt: "2024-10-20T10:00:00Z", excerpt: "An untitled journal moment.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
