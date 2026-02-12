@@ -17,32 +17,23 @@ const ProjectDetail = () => {
   return (
     <div className="px-6 py-16 max-w-4xl mx-auto">
       {project.featured && (
-        <span className="inline-block text-xs uppercase tracking-widest border border-foreground px-2 py-1 text-foreground mb-4">
-          Featured
-        </span>
+        <span className="inline-block text-xs uppercase tracking-widest border border-foreground px-2 py-1 text-foreground mb-4">Featured</span>
       )}
       <h1 className="text-3xl font-light tracking-wide text-foreground mb-2">{project.title}</h1>
       <p className="text-sm text-muted-foreground mb-8">
-        {project.category} · {project.year}
+        {project.category.title} · {project.year}
         {project.collaborators && ` · ${project.collaborators}`}
       </p>
-
-      {/* Description (placeholder for portable text) */}
-      <div className="prose prose-neutral max-w-none mb-12">
+      <div className="mb-12">
         <p className="text-muted-foreground leading-relaxed">{project.description}</p>
       </div>
-
-      {/* Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {project.gallery.map((img, i) => (
           <img key={i} src={img.src} alt={img.alt} className="w-full h-64 object-cover bg-muted" />
         ))}
       </div>
-
       <div className="mt-12">
-        <Link to="/projects" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-          ← Back to projects
-        </Link>
+        <Link to="/projects" className="text-sm text-muted-foreground hover:text-foreground transition-colors">← Back to projects</Link>
       </div>
     </div>
   );
