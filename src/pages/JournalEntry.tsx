@@ -17,15 +17,15 @@ const JournalEntry = () => {
 
   return (
     <div className="px-6 py-16 max-w-3xl mx-auto">
-      <img src={entry.image} alt={entry.text} className="w-full h-[50vh] object-cover bg-muted mb-6" />
-      <p className="text-lg text-foreground mb-2">{entry.text}</p>
-      <p className="text-sm text-muted-foreground">
-        {format(new Date(entry.createdAt), "d MMMM yyyy")}
-      </p>
+      <img src={entry.coverImage} alt={entry.title || entry.excerpt} className="w-full h-[50vh] object-cover bg-muted mb-6" />
+      {entry.title && <h1 className="text-3xl font-light tracking-wide text-foreground mb-2">{entry.title}</h1>}
+      <p className="text-sm text-muted-foreground mb-8">{format(new Date(entry.publishedAt), "d MMMM yyyy")}</p>
+      {/* Portable text body placeholder */}
+      <div className="text-muted-foreground leading-relaxed space-y-4">
+        <p>{entry.body}</p>
+      </div>
       <div className="mt-12">
-        <Link to="/journal" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-          ← Back to journal
-        </Link>
+        <Link to="/journal" className="text-sm text-muted-foreground hover:text-foreground transition-colors">← Back to journal</Link>
       </div>
     </div>
   );
