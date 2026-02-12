@@ -1,17 +1,17 @@
-import HeroSlider from "@/components/home/HeroSlider";
-import IntroSection from "@/components/home/IntroSection";
-import ProjectsPreview from "@/components/home/ProjectsPreview";
-import SpotifyEmbed from "@/components/home/SpotifyEmbed";
-import StudioRedirect from "@/components/home/StudioRedirect";
+import HomeHero from "../sections/HomeHero";
+import HomeIntro from "../sections/HomeIntro";
+import HomeProjects from "../sections/HomeProjects";
+import HomeSpotify from "../sections/HomeSpotify";
+import HomeStudioRedirect from "../sections/HomeStudioRedirect";
 
 const Index = () => {
   return (
     <>
-      <HeroSlider />
-      <IntroSection />
-      <ProjectsPreview />
-      <SpotifyEmbed />
-      <StudioRedirect />
+      <HomeHero />
+      <HomeIntro />
+      <HomeProjects />
+      <HomeSpotify />
+      <HomeStudioRedirect />
     </>
   );
 };
