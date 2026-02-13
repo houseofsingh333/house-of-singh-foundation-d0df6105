@@ -31,16 +31,13 @@ const HomeIntro = () => {
               }`}
             />
           </div>
-          <p className="text-[10px] tracking-widest uppercase text-muted-foreground mt-4">
-            Toronto, Canada
-          </p>
         </div>
 
         {/* Text content — right, vertically centered against portrait */}
         <div className="md:col-span-5 md:col-start-7 flex flex-col gap-10 md:pt-16 lg:pt-28">
           {/* Roles stacked as a typographic element */}
           <div className="space-y-0">
-            {["Creative Director", "Designer", "Photographer"].map((role, i) => (
+            {["Creative Director", "Multidisciplinary Designer", "Photographer"].map((role, i) => (
               <p
                 key={role}
                 className="font-editorial text-xl md:text-2xl lg:text-[1.75rem] font-light text-foreground leading-[1.5]"
