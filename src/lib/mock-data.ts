@@ -131,7 +131,7 @@ export const journalEntries: JournalEntry[] = [
 
 // --- Site Settings ---
 export const siteSettings: SiteSettings = {
-  spotifyPlaylistUrl: "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M",
+  spotifyPlaylistUrl: "https://open.spotify.com/embed/playlist/5siljeAcGgaINDEqVRBsAg?utm_source=generator",
   instagramUrl: "https://instagram.com/houseofsingh",
   homeHeroMode: "slider",
 };

@@ -1,12 +1,26 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Newsletter subscription:", email);
+    setSubscribed(true);
+    setEmail("");
+  };
+
   return (
     <footer className="px-8 md:px-16 py-20 md:py-28 border-t border-border">
       {/* CTA */}
       <div className="mb-16">
         <p className="font-editorial text-2xl md:text-3xl lg:text-4xl font-light text-foreground leading-snug max-w-lg">
           Want to work together?
+        </p>
+        <p className="text-sm text-muted-foreground mt-3 max-w-md">
+          Let's talk about a project, collaboration or an idea you may have.
         </p>
         <Link
           to="/contact"
@@ -17,35 +31,56 @@ const Footer = () => {
       </div>
 
       {/* Bottom row */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-8 border-t border-border/50">
-        <p className="text-[11px] tracking-widest uppercase text-muted-foreground">
-          &copy; {new Date().getFullYear()} House of Singh
-        </p>
-        <div className="flex gap-6">
-          <Link
-            to="/about"
-            className="text-[11px] tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-          >
-            About
-          </Link>
-          <Link
-            to="/projects"
-            className="text-[11px] tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-          >
-            Projects
-          </Link>
-          <Link
-            to="/journal"
-            className="text-[11px] tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-          >
-            Journal
-          </Link>
-          <Link
-            to="/contact"
-            className="text-[11px] tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-          >
-            Contact
-          </Link>
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 pt-8 border-t border-border/50">
+        {/* Left — nav links + copyright */}
+        <div>
+          <div className="flex flex-wrap gap-6 mb-4">
+            {[
+              { label: "Home", to: "/" },
+              { label: "About", to: "/about" },
+              { label: "Projects", to: "/projects" },
+              { label: "Journal", to: "/journal" },
+              { label: "Contact", to: "/contact" },
+            ].map((link) => (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="text-[11px] tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <p className="text-[11px] tracking-widest uppercase text-muted-foreground">
+            &copy; {new Date().getFullYear()} House of Singh
+          </p>
+        </div>
+
+        {/* Right — newsletter */}
+        <div className="max-w-xs w-full">
+          <p className="text-[11px] tracking-widest uppercase text-muted-foreground mb-3">
+            Newsletter
+          </p>
+          {subscribed ? (
+            <p className="text-sm text-muted-foreground">Thank you for subscribing.</p>
+          ) : (
+            <form onSubmit={handleSubscribe} className="flex">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="flex-1 bg-transparent border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+              <button
+                type="submit"
+                className="border border-border border-l-0 px-4 py-2 text-xs tracking-widest uppercase text-foreground hover:bg-foreground hover:text-background transition-colors duration-300"
+              >
+                →
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </footer>
