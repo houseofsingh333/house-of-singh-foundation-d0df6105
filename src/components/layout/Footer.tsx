@@ -51,12 +51,12 @@ const Footer = () => {
               </Link>
             ))}
           </div>
-          <p className="text-[11px] tracking-widest uppercase text-muted-foreground">
-            &copy; 2026 House of Singh Studios Inc.{" "}
-            <Link to="/terms" className="hover:text-foreground transition-colors duration-300">Terms of Use</Link>
-            {" and "}
-            <Link to="/privacy" className="hover:text-foreground transition-colors duration-300">Privacy Policy</Link>
-          </p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] tracking-widest uppercase text-muted-foreground">
+            <span>&copy; 2026 House of Singh Studios Inc.</span>
+            <span className="hidden md:inline text-border">·</span>
+            <Link to="/terms" className="hover:text-foreground transition-colors duration-300">Terms</Link>
+            <Link to="/privacy" className="hover:text-foreground transition-colors duration-300">Privacy</Link>
+          </div>
         </div>
 
         {/* Right — newsletter */}
