@@ -25,7 +25,7 @@ const HomeJournal = () => {
   };
 
   return (
-    <section className="px-8 md:px-16 py-20 md:py-28">
+    <section className="px-8 md:px-16 py-24 md:py-36">
       <div className="flex items-baseline justify-between mb-14">
         <h2 className="text-xs tracking-widest uppercase text-muted-foreground">
           Journal

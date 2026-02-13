@@ -1,9 +1,10 @@
 const HomeSpotify = () => {
   return (
-    <section className="px-8 md:px-16 py-20 md:py-28 max-w-5xl">
-      <p className="text-xs tracking-widest uppercase text-muted-foreground mb-10">
+    <section className="px-8 md:px-16 py-24 md:py-36">
+      <p className="text-xs tracking-widest uppercase text-muted-foreground mb-4">
         Now Playing
       </p>
+      <div className="w-full h-px bg-border mb-12" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
         {/* Spotify embed */}

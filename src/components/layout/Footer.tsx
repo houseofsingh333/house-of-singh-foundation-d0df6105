@@ -13,7 +13,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="px-8 md:px-16 py-20 md:py-28 border-t border-border">
+    <footer className="px-8 md:px-16 py-24 md:py-36 border-t border-border">
       {/* CTA */}
       <div className="mb-16">
         <p className="font-editorial text-2xl md:text-3xl lg:text-4xl font-light text-foreground leading-snug max-w-lg">
@@ -64,18 +64,18 @@ const Footer = () => {
           {subscribed ? (
             <p className="text-sm text-muted-foreground">Thank you for subscribing.</p>
           ) : (
-            <form onSubmit={handleSubscribe} className="flex">
+            <form onSubmit={handleSubscribe} className="flex items-center gap-0">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="flex-1 bg-transparent border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                className="flex-1 bg-transparent border-0 border-b border-border px-0 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground transition-colors duration-300"
               />
               <button
                 type="submit"
-                className="border border-border border-l-0 px-4 py-2 text-xs tracking-widest uppercase text-foreground hover:bg-foreground hover:text-background transition-colors duration-300"
+                className="px-3 py-2 text-xs tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
               >
                 →
               </button>
