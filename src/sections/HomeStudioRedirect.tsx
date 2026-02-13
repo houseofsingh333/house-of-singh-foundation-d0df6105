@@ -2,14 +2,14 @@ import { ArrowUpRight } from "lucide-react";
 
 const HomeStudioRedirect = () => {
   return (
-    <section className="bg-foreground text-background px-8 md:px-16 py-24 md:py-36">
-      <div className="max-w-5xl mx-auto flex flex-col items-center text-center gap-8">
+    <section className="bg-foreground text-background px-8 md:px-16 py-16 md:py-24">
+      <div className="max-w-5xl mx-auto flex flex-col items-center text-center gap-6">
         <p className="text-[10px] tracking-[0.3em] uppercase text-background/40">
           A different practice
         </p>
 
-        <h3 className="font-editorial text-3xl md:text-5xl lg:text-6xl font-light leading-[1.1]">
-          Studios
+        <h3 className="font-editorial text-2xl md:text-4xl lg:text-5xl font-light leading-[1.1]">
+          House of Singh Studios
         </h3>
 
         <p className="text-sm md:text-[15px] text-background/60 leading-[1.8] max-w-md">
