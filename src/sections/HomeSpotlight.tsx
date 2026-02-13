@@ -17,7 +17,7 @@ const HomeSpotlight = () => {
           className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03]"
         />
         {/* Dark gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-black/50" />
 
         {/* Content overlay */}
         <div className="absolute inset-0 flex flex-col justify-end px-8 md:px-16 pb-12 md:pb-20">

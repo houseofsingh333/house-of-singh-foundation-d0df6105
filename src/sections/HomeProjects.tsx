@@ -60,7 +60,7 @@ const HomeProjects = () => {
 
               {/* Collapsed — horizontal text at bottom */}
               <div
-                className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 transition-opacity duration-500"
+                className="absolute inset-0 flex flex-col items-center justify-center p-6 md:p-8 transition-opacity duration-500"
                 style={{ opacity: isHovered ? 0 : 1 }}
               >
                 <p className="text-[10px] tracking-widest text-muted-foreground/50 mb-2">
