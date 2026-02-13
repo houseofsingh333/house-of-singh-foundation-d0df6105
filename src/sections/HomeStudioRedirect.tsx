@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 
 const HomeStudioRedirect = () => {
   return (
-    <section className="px-8 md:px-16 py-20 md:py-28 border-t border-border">
+    <section className="px-8 md:px-16 py-24 md:py-36 border-t border-border">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div>
           <h3 className="font-editorial text-xl md:text-2xl font-light text-foreground">
