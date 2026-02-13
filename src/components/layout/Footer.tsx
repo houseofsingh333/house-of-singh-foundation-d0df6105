@@ -52,7 +52,10 @@ const Footer = () => {
             ))}
           </div>
           <p className="text-[11px] tracking-widest uppercase text-muted-foreground">
-            &copy; {new Date().getFullYear()} House of Singh
+            &copy; 2026 House of Singh Studios Inc.{" "}
+            <Link to="/terms" className="hover:text-foreground transition-colors duration-300">Terms of Use</Link>
+            {" and "}
+            <Link to="/privacy" className="hover:text-foreground transition-colors duration-300">Privacy Policy</Link>
           </p>
         </div>
 
