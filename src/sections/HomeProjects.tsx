@@ -73,7 +73,7 @@ const HomeProjects = () => {
 
               {/* Expanded — full info */}
               <div
-                className="absolute inset-0 flex flex-col justify-end p-8 md:p-10 transition-opacity duration-500"
+                className="absolute inset-0 flex flex-col items-center justify-center p-8 md:p-10 transition-opacity duration-500"
                 style={{ opacity: isHovered ? 1 : 0 }}
               >
                 <p className="text-[10px] tracking-widest text-muted-foreground mb-3">
