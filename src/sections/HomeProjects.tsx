@@ -13,7 +13,7 @@ const HomeProjects = () => {
 
   return (
     <section className="px-8 md:px-16 py-24 md:py-36">
-      {/* Section header with rule */}
+      {/* Section header */}
       <div className="flex items-baseline justify-between mb-6">
         <h2 className="font-editorial text-2xl md:text-3xl font-light text-foreground">
           Projects
@@ -27,46 +27,81 @@ const HomeProjects = () => {
       </div>
       <div className="w-full h-px bg-border mb-14" />
 
-      {/* Category cards — inspired by reference grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        {projectCategories.map((cat) => (
-          <Link
-            key={cat._id}
-            to={`/projects?filter=${cat.slug}`}
-            className="group relative bg-secondary/40 overflow-hidden hover:bg-secondary transition-colors duration-500"
-            onMouseEnter={() => setHoveredId(cat._id)}
-            onMouseLeave={() => setHoveredId(null)}
-          >
-            {/* Hover GIF/image preview */}
-            <div
-              className={`absolute inset-0 transition-opacity duration-700 pointer-events-none ${
-                hoveredId === cat._id ? "opacity-25" : "opacity-0"
-              }`}
-            >
-              <img
-                src={categoryPreviews[cat.slug] || "/placeholder.svg"}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            </div>
+      {/* Vertical accordion strips */}
+      <div className="flex gap-px bg-border h-[420px] md:h-[520px] overflow-hidden">
+        {projectCategories.map((cat) => {
+          const isHovered = hoveredId === cat._id;
+          const hasHover = hoveredId !== null;
 
-            {/* Content */}
-            <div className="relative z-10 p-8 md:p-10 min-h-[220px] flex flex-col justify-end">
-              <p className="text-[11px] tracking-widest uppercase text-muted-foreground mb-3 transition-colors duration-300 group-hover:text-foreground">
-                {String(cat.order).padStart(2, "0")}
-              </p>
-              <h3 className="font-editorial text-lg md:text-xl font-light text-foreground">
-                {cat.title}
-              </h3>
-              <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-                <span className="text-xs tracking-widest uppercase text-muted-foreground">
-                  View
-                </span>
-                <span className="text-muted-foreground text-xs">→</span>
+          return (
+            <Link
+              key={cat._id}
+              to={`/projects?filter=${cat.slug}`}
+              className="relative bg-background overflow-hidden group cursor-pointer"
+              style={{
+                flex: isHovered ? 4 : hasHover ? 0.5 : 1,
+                transition: "flex 0.7s cubic-bezier(0.25, 0.1, 0.25, 1)",
+              }}
+              onMouseEnter={() => setHoveredId(cat._id)}
+              onMouseLeave={() => setHoveredId(null)}
+            >
+              {/* Background image — revealed on expand */}
+              <div
+                className="absolute inset-0 transition-opacity duration-700"
+                style={{ opacity: isHovered ? 0.2 : 0 }}
+              >
+                <img
+                  src={categoryPreviews[cat.slug] || "/placeholder.svg"}
+                  alt=""
+                  className="w-full h-full object-cover scale-110 transition-transform duration-1000"
+                  style={{ transform: isHovered ? "scale(1)" : "scale(1.1)" }}
+                />
               </div>
-            </div>
-          </Link>
-        ))}
+
+              {/* Collapsed state — rotated text */}
+              <div
+                className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
+                style={{ opacity: isHovered ? 0 : 1 }}
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <p className="text-[10px] tracking-widest text-muted-foreground/50">
+                    {String(cat.order).padStart(2, "0")}
+                  </p>
+                  <p
+                    className="font-editorial text-sm md:text-base font-light text-foreground tracking-wider uppercase whitespace-nowrap"
+                    style={{
+                      writingMode: "vertical-rl",
+                      textOrientation: "mixed",
+                    }}
+                  >
+                    {cat.title}
+                  </p>
+                </div>
+              </div>
+
+              {/* Expanded state — full info */}
+              <div
+                className="absolute inset-0 flex flex-col justify-end p-8 md:p-10 transition-opacity duration-500"
+                style={{ opacity: isHovered ? 1 : 0 }}
+              >
+                <p className="text-[10px] tracking-widest text-muted-foreground mb-3">
+                  {String(cat.order).padStart(2, "0")}
+                </p>
+                <h3 className="font-editorial text-2xl md:text-3xl font-light text-foreground mb-4">
+                  {cat.title}
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs tracking-widest uppercase text-muted-foreground">
+                    View
+                  </span>
+                  <span className="text-muted-foreground text-xs transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
