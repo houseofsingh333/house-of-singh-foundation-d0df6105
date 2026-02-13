@@ -10,6 +10,7 @@ const categoryPreviews: Record<string, string> = {
 
 const HomeProjects = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const hoveredCat = projectCategories.find((c) => c._id === hoveredId);
 
   return (
     <section className="px-8 md:px-16 py-24 md:py-36">
@@ -27,81 +28,88 @@ const HomeProjects = () => {
       </div>
       <div className="w-full h-px bg-border mb-14" />
 
-      {/* Vertical accordion strips */}
-      <div className="flex gap-px bg-border h-[420px] md:h-[520px] overflow-hidden">
-        {projectCategories.map((cat) => {
-          const isHovered = hoveredId === cat._id;
-          const hasHover = hoveredId !== null;
-
-          return (
-            <Link
-              key={cat._id}
-              to={`/projects?filter=${cat.slug}`}
-              className="relative bg-background overflow-hidden group cursor-pointer"
+      {/* Marquee strip */}
+      <div className="relative overflow-hidden">
+        {/* Scrolling marquee */}
+        <div
+          className="flex whitespace-nowrap"
+          style={{
+            animationPlayState: hoveredId ? "paused" : "running",
+          }}
+        >
+          {/* Double the items for seamless loop */}
+          {[...Array(2)].map((_, loopIdx) => (
+            <div
+              key={loopIdx}
+              className="flex shrink-0 animate-[marquee_20s_linear_infinite]"
               style={{
-                flex: isHovered ? 4 : hasHover ? 0.5 : 1,
-                transition: "flex 0.7s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                animationPlayState: hoveredId ? "paused" : "running",
               }}
-              onMouseEnter={() => setHoveredId(cat._id)}
-              onMouseLeave={() => setHoveredId(null)}
             >
-              {/* Background image — revealed on expand */}
-              <div
-                className="absolute inset-0 transition-opacity duration-700"
-                style={{ opacity: isHovered ? 0.2 : 0 }}
-              >
-                <img
-                  src={categoryPreviews[cat.slug] || "/placeholder.svg"}
-                  alt=""
-                  className="w-full h-full object-cover scale-110 transition-transform duration-1000"
-                  style={{ transform: isHovered ? "scale(1)" : "scale(1.1)" }}
-                />
-              </div>
+              {projectCategories.map((cat) => {
+                const isHovered = hoveredId === cat._id;
+                const hasHover = hoveredId !== null;
 
-              {/* Collapsed state — rotated text */}
-              <div
-                className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
-                style={{ opacity: isHovered ? 0 : 1 }}
-              >
-                <div className="flex flex-col items-center gap-4">
-                  <p className="text-[10px] tracking-widest text-muted-foreground/50">
-                    {String(cat.order).padStart(2, "0")}
-                  </p>
-                  <p
-                    className="font-editorial text-sm md:text-base font-light text-foreground tracking-wider uppercase whitespace-nowrap"
-                    style={{
-                      writingMode: "vertical-rl",
-                      textOrientation: "mixed",
-                    }}
+                return (
+                  <Link
+                    key={`${loopIdx}-${cat._id}`}
+                    to={`/projects?filter=${cat.slug}`}
+                    className="inline-flex items-baseline gap-3 md:gap-4 px-6 md:px-10 group cursor-pointer"
+                    onMouseEnter={() => setHoveredId(cat._id)}
+                    onMouseLeave={() => setHoveredId(null)}
                   >
-                    {cat.title}
-                  </p>
-                </div>
-              </div>
+                    <span
+                      className="text-[10px] tracking-widest text-muted-foreground/40 transition-colors duration-300"
+                      style={{ color: isHovered ? "hsl(var(--foreground))" : undefined }}
+                    >
+                      {String(cat.order).padStart(2, "0")}
+                    </span>
+                    <span
+                      className="font-editorial text-4xl md:text-6xl lg:text-7xl font-light transition-all duration-500"
+                      style={{
+                        color: hasHover && !isHovered
+                          ? "hsl(var(--muted-foreground) / 0.2)"
+                          : "hsl(var(--foreground))",
+                        letterSpacing: isHovered ? "0.05em" : "0",
+                      }}
+                    >
+                      {cat.title}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
 
-              {/* Expanded state — full info */}
-              <div
-                className="absolute inset-0 flex flex-col justify-end p-8 md:p-10 transition-opacity duration-500"
-                style={{ opacity: isHovered ? 1 : 0 }}
-              >
-                <p className="text-[10px] tracking-widest text-muted-foreground mb-3">
-                  {String(cat.order).padStart(2, "0")}
-                </p>
-                <h3 className="font-editorial text-2xl md:text-3xl font-light text-foreground mb-4">
-                  {cat.title}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs tracking-widest uppercase text-muted-foreground">
-                    View
-                  </span>
-                  <span className="text-muted-foreground text-xs transition-transform duration-300 group-hover:translate-x-1">
-                    →
-                  </span>
-                </div>
+      {/* Reveal image strip below */}
+      <div
+        className="relative overflow-hidden transition-all duration-700 ease-out mt-8"
+        style={{ maxHeight: hoveredId ? "280px" : "0", opacity: hoveredId ? 1 : 0 }}
+      >
+        <div className="w-full h-[280px] bg-secondary overflow-hidden">
+          {hoveredCat && (
+            <img
+              src={categoryPreviews[hoveredCat.slug] || "/placeholder.svg"}
+              alt={hoveredCat.title}
+              className="w-full h-full object-cover transition-transform duration-1000 scale-105 hover:scale-100"
+            />
+          )}
+          {hoveredCat && (
+            <div className="absolute bottom-6 left-8 md:left-10">
+              <p className="text-xs tracking-widest uppercase text-foreground/70">
+                {hoveredCat.title}
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs tracking-widest uppercase text-muted-foreground">
+                  View
+                </span>
+                <span className="text-muted-foreground text-xs">→</span>
               </div>
-            </Link>
-          );
-        })}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
