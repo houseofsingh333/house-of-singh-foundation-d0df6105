@@ -145,15 +145,20 @@ const About = () => {
 
       {/* ——— 3 · House of Singh ——— */}
       <section className="px-8 md:px-16 py-24 md:py-36">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
             House of Singh
           </p>
-          <div className="w-full h-px bg-border mb-12" />
+          <div className="w-full h-px bg-border mb-16" />
 
-          <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
-            <img src={hosLogo} alt="House of Singh" className="w-28 h-28 object-contain opacity-50 shrink-0" />
-            <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center">
+            {/* Logo — left, vertically centered */}
+            <div className="md:col-span-4 flex justify-center">
+              <img src={hosLogo} alt="House of Singh" className="w-36 md:w-44 object-contain opacity-40" />
+            </div>
+
+            {/* Text — right */}
+            <div className="md:col-span-8 space-y-6">
               <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
                 Under the identity of House of Singh, Maninder has created a platform
                 where design, photography, and storytelling come together to inspire
