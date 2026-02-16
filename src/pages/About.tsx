@@ -145,12 +145,14 @@ const About = () => {
 
       {/* ——— 3 · House of Singh ——— */}
       <section className="px-8 md:px-16 py-24 md:py-36">
-        <div className="max-w-4xl mx-auto">
+        <div className="mb-16">
           <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
             The Moniker
           </p>
-          <div className="w-full h-px bg-border mb-16" />
+          <div className="w-full h-px bg-border" />
+        </div>
 
+        <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center">
             {/* Logo — left, vertically centered */}
             <div className="md:col-span-4 flex justify-center">
