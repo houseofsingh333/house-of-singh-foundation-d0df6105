@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import portraitImage from "@/assets/maninder-portrait.jpg";
+import hosLogo from "@/assets/house-of-singh-logo.png";
 
 /* ——— Timeline data ——— */
 const milestones = [
@@ -66,11 +67,20 @@ const testimonials = [
 
 const About = () => {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const [fadeClass, setFadeClass] = useState("opacity-100");
+
+  const changeTestimonial = (next: number) => {
+    setFadeClass("opacity-0");
+    setTimeout(() => {
+      setTestimonialIndex(next);
+      setFadeClass("opacity-100");
+    }, 300);
+  };
 
   const prevTestimonial = () =>
-    setTestimonialIndex((i) => (i === 0 ? testimonials.length - 1 : i - 1));
+    changeTestimonial(testimonialIndex === 0 ? testimonials.length - 1 : testimonialIndex - 1);
   const nextTestimonial = () =>
-    setTestimonialIndex((i) => (i === testimonials.length - 1 ? 0 : i + 1));
+    changeTestimonial(testimonialIndex === testimonials.length - 1 ? 0 : testimonialIndex + 1);
 
   return (
     <div className="overflow-hidden">
@@ -136,9 +146,12 @@ const About = () => {
       {/* ——— 3 · House of Singh ——— */}
       <section className="px-8 md:px-16 py-24 md:py-36">
         <div className="max-w-2xl mx-auto">
-          <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
-            House of Singh
-          </p>
+          <div className="flex items-center gap-4 mb-4">
+            <img src={hosLogo} alt="House of Singh" className="w-10 h-10 object-contain opacity-60" />
+            <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground">
+              House of Singh
+            </p>
+          </div>
           <div className="w-full h-px bg-border mb-12" />
 
           <div className="space-y-6">
@@ -277,19 +290,21 @@ const About = () => {
         </div>
 
         <div className="max-w-2xl mx-auto text-center">
-          <blockquote className="font-editorial text-xl md:text-2xl font-light leading-[1.5] text-foreground mb-8 min-h-[120px] flex items-center justify-center">
-            "{testimonials[testimonialIndex].quote}"
-          </blockquote>
-          <p className="text-xs tracking-[0.15em] uppercase text-foreground">
-            {testimonials[testimonialIndex].name}
-          </p>
-          {testimonials[testimonialIndex].role && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {testimonials[testimonialIndex].role}
+          <div className={`transition-opacity duration-300 ease-in-out ${fadeClass}`}>
+            <blockquote className="font-editorial text-xl md:text-2xl font-light leading-[1.5] text-foreground mb-8 min-h-[120px] flex items-center justify-center">
+              "{testimonials[testimonialIndex].quote}"
+            </blockquote>
+            <p className="text-xs tracking-[0.15em] uppercase text-foreground">
+              {testimonials[testimonialIndex].name}
             </p>
-          )}
+            {testimonials[testimonialIndex].role && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {testimonials[testimonialIndex].role}
+              </p>
+            )}
+          </div>
 
-          {/* Navigation */}
+          {/* Navigation — dots + arrows */}
           <div className="flex items-center justify-center gap-6 mt-10">
             <button
               onClick={prevTestimonial}
@@ -298,9 +313,20 @@ const About = () => {
             >
               <ChevronLeft size={20} />
             </button>
-            <span className="text-xs text-muted-foreground tabular-nums">
-              {testimonialIndex + 1} / {testimonials.length}
-            </span>
+            <div className="flex items-center gap-2">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => changeTestimonial(i)}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                    i === testimonialIndex
+                      ? "bg-foreground scale-125"
+                      : "bg-foreground/25 hover:bg-foreground/50"
+                  }`}
+                  aria-label={`Testimonial ${i + 1}`}
+                />
+              ))}
+            </div>
             <button
               onClick={nextTestimonial}
               className="text-muted-foreground hover:text-foreground transition-colors"
