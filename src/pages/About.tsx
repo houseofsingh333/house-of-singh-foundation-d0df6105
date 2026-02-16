@@ -8,31 +8,37 @@ const milestones = [
     year: "2014",
     title: "Founded House of Singh",
     text: "Began the journey in New Delhi.",
+    image: "/placeholder.svg",
   },
   {
     year: "2016",
     title: "First Brand Identity",
     text: "Delivered a full visual system for a heritage label.",
+    image: "/placeholder.svg",
   },
   {
     year: "2018",
     title: "The Sikh Turban",
     text: "A personal project celebrating Sikh identity.",
+    image: "/placeholder.svg",
   },
   {
     year: "2020",
     title: "Editorial & Print",
     text: "Expanded into editorial design and print storytelling.",
+    image: "/placeholder.svg",
   },
   {
     year: "2021",
     title: "Relocation to Canada",
     text: "A new chapter rooted in Toronto.",
+    image: "/placeholder.svg",
   },
   {
     year: "2024",
     title: "A Decade of Craft",
     text: "Ten years of evolving practice and perspective.",
+    image: "/placeholder.svg",
   },
 ];
 
@@ -162,7 +168,7 @@ const About = () => {
         </div>
 
         {/* Vertical timeline */}
-        <div className="relative max-w-3xl mx-auto">
+        <div className="relative max-w-4xl mx-auto">
           {/* Center line */}
           <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-px" />
 
@@ -171,36 +177,90 @@ const About = () => {
             return (
               <div
                 key={m.year}
-                className={`relative flex items-start mb-12 last:mb-0 md:mb-16 ${
-                  isEven
-                    ? "md:flex-row"
-                    : "md:flex-row-reverse"
-                }`}
+                className="timeline-milestone relative mb-14 last:mb-0 md:mb-0 md:min-h-[160px] group"
+                tabIndex={0}
               >
-                {/* Dot on the line */}
-                <div className="absolute left-6 md:left-1/2 top-2 w-2.5 h-2.5 rounded-full bg-foreground/30 -translate-x-1/2 z-10" />
-
-                {/* Content */}
-                <div
-                  className={`pl-14 md:pl-0 md:w-[calc(50%-2rem)] ${
-                    isEven
-                      ? "md:pr-12 md:text-right"
-                      : "md:pl-12 md:text-left"
-                  }`}
-                >
-                  <p className="font-editorial text-4xl md:text-6xl font-light text-foreground/15 leading-none mb-3">
-                    {m.year}
-                  </p>
-                  <p className="text-xs tracking-[0.15em] uppercase text-foreground mb-1">
-                    {m.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground leading-[1.6] max-w-[240px] inline-block">
-                    {m.text}
-                  </p>
+                {/* Dot */}
+                <div className="absolute left-6 md:left-1/2 top-3 -translate-x-1/2 z-10">
+                  <div className="timeline-dot w-2 h-2 rounded-full bg-foreground/25 group-hover:bg-foreground/60 group-focus-within:bg-foreground/60" />
                 </div>
 
-                {/* Spacer for the other side */}
-                <div className="hidden md:block md:w-[calc(50%-2rem)]" />
+                {/* Desktop: two-column grid */}
+                <div className="hidden md:grid md:grid-cols-2 md:gap-0">
+                  {/* Left column */}
+                  <div className={`flex ${isEven ? "justify-end pr-12" : "justify-start pl-12"} ${!isEven ? "order-2" : "order-1"}`}>
+                    {isEven ? (
+                      /* Text on left */
+                      <div className="timeline-content text-right max-w-[280px] py-4">
+                        <p className="timeline-year font-editorial text-5xl font-light text-foreground leading-none mb-2">
+                          {m.year}
+                        </p>
+                        <p className="text-[11px] tracking-[0.15em] uppercase text-foreground mb-1">
+                          {m.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground leading-[1.6]">
+                          {m.text}
+                        </p>
+                      </div>
+                    ) : (
+                      /* Image on left */
+                      <div className="timeline-image w-[220px] aspect-[4/3] overflow-hidden bg-secondary py-4">
+                        <img
+                          src={m.image}
+                          alt={m.title}
+                          className="w-full h-full object-cover grayscale hover:grayscale-0 transition-[filter] duration-700"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right column */}
+                  <div className={`flex ${!isEven ? "justify-end pr-12" : "justify-start pl-12"} ${!isEven ? "order-1" : "order-2"}`}>
+                    {isEven ? (
+                      /* Image on right */
+                      <div className="timeline-image w-[220px] aspect-[4/3] overflow-hidden bg-secondary py-4">
+                        <img
+                          src={m.image}
+                          alt={m.title}
+                          className="w-full h-full object-cover grayscale hover:grayscale-0 transition-[filter] duration-700"
+                        />
+                      </div>
+                    ) : (
+                      /* Text on right */
+                      <div className="timeline-content-reverse text-left max-w-[280px] py-4">
+                        <p className="timeline-year font-editorial text-5xl font-light text-foreground leading-none mb-2">
+                          {m.year}
+                        </p>
+                        <p className="text-[11px] tracking-[0.15em] uppercase text-foreground mb-1">
+                          {m.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground leading-[1.6]">
+                          {m.text}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Mobile: single column, image below text */}
+                <div className="md:hidden pl-14">
+                  <p className="timeline-year font-editorial text-4xl font-light text-foreground leading-none mb-2">
+                    {m.year}
+                  </p>
+                  <p className="text-[11px] tracking-[0.15em] uppercase text-foreground mb-1">
+                    {m.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-[1.6] mb-3">
+                    {m.text}
+                  </p>
+                  <div className="w-[180px] aspect-[4/3] overflow-hidden bg-secondary">
+                    <img
+                      src={m.image}
+                      alt={m.title}
+                      className="w-full h-full object-cover grayscale"
+                    />
+                  </div>
+                </div>
               </div>
             );
           })}
