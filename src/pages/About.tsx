@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import portraitImage from "@/assets/maninder-portrait.jpg";
 
@@ -60,21 +60,6 @@ const testimonials = [
 
 const About = () => {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
-  const timelineRef = useRef<HTMLDivElement>(null);
-
-  /* Horizontal wheel scroll for timeline on desktop */
-  useEffect(() => {
-    const el = timelineRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        el.scrollLeft += e.deltaY;
-      }
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
 
   const prevTestimonial = () =>
     setTestimonialIndex((i) => (i === 0 ? testimonials.length - 1 : i - 1));
@@ -169,41 +154,56 @@ const About = () => {
 
       {/* ——— 4 · Timeline — TEN YEARS ON ——— */}
       <section className="px-8 md:px-16 py-24 md:py-36">
-        <div className="mb-12">
+        <div className="mb-16">
           <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
             Ten Years On
           </p>
           <div className="w-full h-px bg-border" />
         </div>
 
-        <div
-          ref={timelineRef}
-          className="flex gap-px overflow-x-auto scroll-snap-x-mandatory pb-4 -mx-8 md:-mx-16 px-8 md:px-16"
-          style={{
-            scrollSnapType: "x mandatory",
-            WebkitOverflowScrolling: "touch",
-          }}
-        >
-          {milestones.map((m) => (
-            <div
-              key={m.year}
-              className="min-w-[260px] md:min-w-[280px] flex-shrink-0 p-6 md:p-8 bg-background border border-border/50 flex flex-col justify-between min-h-[220px] hover:bg-secondary/30 transition-colors duration-500 focus-within:ring-1 focus-within:ring-ring"
-              style={{ scrollSnapAlign: "start" }}
-              tabIndex={0}
-            >
-              <p className="font-editorial text-4xl md:text-5xl font-light text-foreground/20 leading-none">
-                {m.year}
-              </p>
-              <div className="mt-auto pt-8">
-                <p className="text-xs tracking-[0.15em] uppercase text-foreground mb-1">
-                  {m.title}
-                </p>
-                <p className="text-xs text-muted-foreground leading-[1.6]">
-                  {m.text}
-                </p>
+        {/* Vertical timeline */}
+        <div className="relative max-w-3xl mx-auto">
+          {/* Center line */}
+          <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-px" />
+
+          {milestones.map((m, idx) => {
+            const isEven = idx % 2 === 0;
+            return (
+              <div
+                key={m.year}
+                className={`relative flex items-start mb-12 last:mb-0 md:mb-16 ${
+                  isEven
+                    ? "md:flex-row"
+                    : "md:flex-row-reverse"
+                }`}
+              >
+                {/* Dot on the line */}
+                <div className="absolute left-6 md:left-1/2 top-2 w-2.5 h-2.5 rounded-full bg-foreground/30 -translate-x-1/2 z-10" />
+
+                {/* Content */}
+                <div
+                  className={`pl-14 md:pl-0 md:w-[calc(50%-2rem)] ${
+                    isEven
+                      ? "md:pr-12 md:text-right"
+                      : "md:pl-12 md:text-left"
+                  }`}
+                >
+                  <p className="font-editorial text-4xl md:text-6xl font-light text-foreground/15 leading-none mb-3">
+                    {m.year}
+                  </p>
+                  <p className="text-xs tracking-[0.15em] uppercase text-foreground mb-1">
+                    {m.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-[1.6] max-w-[240px] inline-block">
+                    {m.text}
+                  </p>
+                </div>
+
+                {/* Spacer for the other side */}
+                <div className="hidden md:block md:w-[calc(50%-2rem)]" />
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
