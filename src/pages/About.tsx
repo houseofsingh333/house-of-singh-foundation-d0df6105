@@ -147,7 +147,7 @@ const About = () => {
       <section className="px-8 md:px-16 py-24 md:py-36">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
-            House of Singh
+            The Moniker
           </p>
           <div className="w-full h-px bg-border mb-16" />
 
