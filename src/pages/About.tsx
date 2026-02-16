@@ -1,135 +1,254 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import portraitImage from "@/assets/maninder-portrait.jpg";
 
+/* ——— Timeline data ——— */
+const milestones = [
+  {
+    year: "2014",
+    title: "Founded House of Singh",
+    text: "Began the journey in New Delhi.",
+  },
+  {
+    year: "2016",
+    title: "First Brand Identity",
+    text: "Delivered a full visual system for a heritage label.",
+  },
+  {
+    year: "2018",
+    title: "The Sikh Turban",
+    text: "A personal project celebrating Sikh identity.",
+  },
+  {
+    year: "2020",
+    title: "Editorial & Print",
+    text: "Expanded into editorial design and print storytelling.",
+  },
+  {
+    year: "2021",
+    title: "Relocation to Canada",
+    text: "A new chapter rooted in Toronto.",
+  },
+  {
+    year: "2024",
+    title: "A Decade of Craft",
+    text: "Ten years of evolving practice and perspective.",
+  },
+];
+
+/* ——— Testimonial data (placeholders — final copy to be provided) ——— */
+const testimonials = [
+  {
+    quote:
+      "Working with Maninder felt less like a transaction and more like a conversation — one that left our brand feeling truly seen.",
+    name: "Placeholder Name",
+    role: "Creative Lead",
+  },
+  {
+    quote:
+      "He has a rare ability to listen deeply and translate feeling into form. The work speaks quietly but stays with you.",
+    name: "Placeholder Name",
+    role: "Brand Director",
+  },
+  {
+    quote:
+      "Every detail was intentional. The result was not just beautiful — it was meaningful.",
+    name: "Placeholder Name",
+    role: "Founder & CEO",
+  },
+];
+
 const About = () => {
-  const [imageRevealed, setImageRevealed] = useState(false);
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  /* Horizontal wheel scroll for timeline on desktop */
+  useEffect(() => {
+    const el = timelineRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const prevTestimonial = () =>
+    setTestimonialIndex((i) => (i === 0 ? testimonials.length - 1 : i - 1));
+  const nextTestimonial = () =>
+    setTestimonialIndex((i) => (i === testimonials.length - 1 ? 0 : i + 1));
 
   return (
     <div className="overflow-hidden">
-      {/* 1 — Oversized name as texture */}
-      <section className="relative px-8 md:px-16 pt-32 pb-0">
-        <p className="text-xs tracking-widest uppercase text-muted-foreground mb-6">
-          About
+      {/* ——— 1 · Intro Quote ——— */}
+      <section className="px-8 md:px-16 pt-32 md:pt-44 pb-24 md:pb-36 flex items-center justify-center">
+        <p className="font-editorial text-2xl md:text-3xl lg:text-[2.5rem] font-light leading-[1.4] text-center max-w-3xl editorial-fade-in">
+          "The world is filled with beauty, waiting to be seen, felt, and
+          celebrated."
         </p>
-        <div className="w-full h-px bg-border mb-16" />
-
-        {/* Giant display name — acts as visual texture */}
-        <h1 className="font-editorial text-[clamp(3rem,12vw,10rem)] font-light leading-[0.9] text-foreground/[0.07] select-none pointer-events-none whitespace-nowrap -ml-2">
-          Maninder
-          <br />
-          Singh
-        </h1>
       </section>
 
-      {/* 2 — Overlapping image + text block */}
-      <section className="relative px-8 md:px-16 -mt-24 md:-mt-40 pb-24 md:pb-36">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-0 md:gap-8 items-start">
-          {/* Portrait — overlaps the giant text */}
-          <div
-            className="md:col-span-4 md:col-start-2 relative z-10"
-            onMouseEnter={() => setImageRevealed(true)}
-          >
+      {/* ——— 2 · Founder Section ——— */}
+      <section className="px-8 md:px-16 pb-24 md:pb-36">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 items-start">
+          {/* Text — left */}
+          <div className="md:col-span-6 flex flex-col gap-10 order-2 md:order-1">
+            <div>
+              <h2 className="text-xs tracking-[0.25em] uppercase text-foreground mb-4">
+                Maninder Singh
+              </h2>
+              <div className="space-y-1 mb-8">
+                {["Creative Director", "Multidisciplinary Designer", "Photographer"].map(
+                  (role) => (
+                    <p
+                      key={role}
+                      className="font-editorial text-lg md:text-xl font-light text-muted-foreground leading-[1.5]"
+                    >
+                      {role}
+                    </p>
+                  )
+                )}
+              </div>
+              <div className="space-y-6 max-w-md">
+                <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
+                  Guided by a curiosity for life's quiet wonders, Maninder crafts
+                  narratives that celebrate the rhythm of nature and human
+                  connection. Based in Toronto, his work bridges the visual and the
+                  emotional, creating impactful stories through different mediums,
+                  including design and photography.
+                </p>
+                <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
+                  Beyond his creative practice, he finds balance and inspiration in
+                  flying FPV drones, playing golf, and staying committed to fitness,
+                  grounding his work in discipline, movement, and reflection.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Portrait — right */}
+          <div className="md:col-span-5 md:col-start-8 order-1 md:order-2">
             <div className="w-full aspect-[3/4] overflow-hidden bg-secondary">
               <img
                 src={portraitImage}
                 alt="Maninder Singh — Creative Director, Designer & Photographer"
-                className={`w-full h-full object-cover object-top transition-all duration-1000 ${
-                  imageRevealed ? "grayscale-0 scale-100" : "grayscale scale-[1.05]"
-                }`}
+                className="w-full h-full object-cover object-top"
               />
             </div>
-            <p className="text-[10px] tracking-widest uppercase text-muted-foreground mt-4">
-              Toronto, Canada
-            </p>
-          </div>
-
-          {/* Right — roles stacked vertically + intro */}
-          <div className="md:col-span-5 md:col-start-7 flex flex-col gap-12 pt-12 md:pt-24">
-            {/* Roles as a vertical list */}
-            <div className="space-y-1">
-              {["Creative Director", "Multidisciplinary Designer", "Photographer"].map(
-                (role, i) => (
-                  <p
-                    key={role}
-                    className="font-editorial text-xl md:text-2xl lg:text-3xl font-light text-foreground leading-[1.4]"
-                    style={{ opacity: 1 - i * 0.15 }}
-                  >
-                    {role}
-                  </p>
-                )
-              )}
-            </div>
-
-            <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8] max-w-sm">
-              Guided by a deep curiosity for life's quiet wonders, creating work
-              that reflects the rhythm of nature and human connection.
-            </p>
           </div>
         </div>
       </section>
 
-      {/* 3 — Bio as a single centered column with large pull-quote */}
-      <section className="px-8 md:px-16 pb-24 md:pb-36">
-        <div className="max-w-2xl mx-auto md:ml-[16.666%]">
-          {/* Pull quote */}
-          <blockquote className="font-editorial text-2xl md:text-[2rem] font-light leading-[1.4] text-foreground mb-12 relative">
-            <span className="absolute -left-6 md:-left-10 top-0 text-4xl md:text-5xl text-foreground/10 font-editorial leading-none">
-              "
-            </span>
-            Design is not decoration — it's a way of seeing the world and
-            giving meaning to what we often overlook.
-          </blockquote>
+      {/* ——— 3 · House of Singh ——— */}
+      <section className="px-8 md:px-16 py-24 md:py-36">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
+            House of Singh
+          </p>
+          <div className="w-full h-px bg-border mb-12" />
 
           <div className="space-y-6">
             <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
-              Based in Toronto, Maninder Singh blends design and photography to
-              craft stories that feel both visually refined and emotionally
-              resonant. His practice spans brand identities, editorial work,
-              and fine art — always grounded in intention and detail.
+              Under the identity of House of Singh, Maninder has created a platform
+              where design, photography, and storytelling come together to inspire
+              connection and reflection. It serves as a space to showcase an
+              evolving body of work, spanning present explorations and future
+              ventures across diverse mediums and collaborations.
             </p>
             <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
-              Every project begins with observation — noticing the interplay of
-              light, texture, and emotion in the everyday. This quiet attention
-              shapes work that feels both considered and alive, whether it's a
-              brand system, a photographic series, or a collaborative concept.
+              Guided by empathy and curiosity, House of Singh bridges the visual
+              and emotional, crafting narratives that celebrate beauty, purpose, and
+              meaning.
             </p>
           </div>
         </div>
       </section>
 
-      {/* 4 — Disciplines as a horizontal ticker-style row */}
-      <section className="px-8 md:px-16 pb-24 md:pb-36">
-        <div className="mb-16">
-          <p className="text-xs tracking-widest uppercase text-muted-foreground">
-            Disciplines
+      {/* ——— 4 · Timeline — TEN YEARS ON ——— */}
+      <section className="px-8 md:px-16 py-24 md:py-36">
+        <div className="mb-12">
+          <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
+            Ten Years On
           </p>
-          <div className="w-full h-px bg-border mt-4" />
+          <div className="w-full h-px bg-border" />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border">
-          {[
-            { num: "01", label: "Brand Identity", desc: "Visual systems that carry meaning and memory." },
-            { num: "02", label: "Photography", desc: "Moments distilled into quiet, lasting frames." },
-            { num: "03", label: "Creative Direction", desc: "Guiding vision from concept to craft." },
-            { num: "04", label: "Editorial Design", desc: "Layouts that breathe, inform, and inspire." },
-          ].map((item) => (
+        <div
+          ref={timelineRef}
+          className="flex gap-px overflow-x-auto scroll-snap-x-mandatory pb-4 -mx-8 md:-mx-16 px-8 md:px-16"
+          style={{
+            scrollSnapType: "x mandatory",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          {milestones.map((m) => (
             <div
-              key={item.num}
-              className="bg-background p-6 md:p-8 flex flex-col justify-between min-h-[200px] group hover:bg-secondary/50 transition-colors duration-500"
+              key={m.year}
+              className="min-w-[260px] md:min-w-[280px] flex-shrink-0 p-6 md:p-8 bg-background border border-border/50 flex flex-col justify-between min-h-[220px] hover:bg-secondary/30 transition-colors duration-500 focus-within:ring-1 focus-within:ring-ring"
+              style={{ scrollSnapAlign: "start" }}
+              tabIndex={0}
             >
-              <p className="text-xs text-muted-foreground/50 font-light">
-                {item.num}
+              <p className="font-editorial text-4xl md:text-5xl font-light text-foreground/20 leading-none">
+                {m.year}
               </p>
-              <div>
-                <p className="text-xs tracking-widest uppercase text-foreground mb-2 group-hover:tracking-[0.2em] transition-all duration-500">
-                  {item.label}
+              <div className="mt-auto pt-8">
+                <p className="text-xs tracking-[0.15em] uppercase text-foreground mb-1">
+                  {m.title}
                 </p>
-                <p className="text-xs text-muted-foreground leading-[1.6] opacity-0 group-hover:opacity-100 transition-opacity duration-500 max-h-0 group-hover:max-h-20 overflow-hidden">
-                  {item.desc}
+                <p className="text-xs text-muted-foreground leading-[1.6]">
+                  {m.text}
                 </p>
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ——— 5 · Words Shared ——— */}
+      <section className="px-8 md:px-16 py-24 md:py-36">
+        <div className="mb-12">
+          <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
+            Words Shared
+          </p>
+          <div className="w-full h-px bg-border" />
+        </div>
+
+        <div className="max-w-2xl mx-auto text-center">
+          <blockquote className="font-editorial text-xl md:text-2xl font-light leading-[1.5] text-foreground mb-8 min-h-[120px] flex items-center justify-center">
+            "{testimonials[testimonialIndex].quote}"
+          </blockquote>
+          <p className="text-xs tracking-[0.15em] uppercase text-foreground">
+            {testimonials[testimonialIndex].name}
+          </p>
+          {testimonials[testimonialIndex].role && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {testimonials[testimonialIndex].role}
+            </p>
+          )}
+
+          {/* Navigation */}
+          <div className="flex items-center justify-center gap-6 mt-10">
+            <button
+              onClick={prevTestimonial}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {testimonialIndex + 1} / {testimonials.length}
+            </span>
+            <button
+              onClick={nextTestimonial}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Next testimonial"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
         </div>
       </section>
     </div>
