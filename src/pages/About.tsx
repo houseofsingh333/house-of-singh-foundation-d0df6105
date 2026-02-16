@@ -146,14 +146,14 @@ const About = () => {
       {/* ——— 3 · House of Singh ——— */}
       <section className="px-8 md:px-16 py-24 md:py-36">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-4 mb-4">
-            <img src={hosLogo} alt="House of Singh" className="w-40 h-40 object-contain opacity-60" />
-            <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground">
-              House of Singh
-            </p>
-          </div>
+          <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
+            House of Singh
+          </p>
           <div className="w-full h-px bg-border mb-12" />
 
+          <div className="flex justify-center mb-12">
+            <img src={hosLogo} alt="House of Singh" className="w-40 h-40 object-contain opacity-60" />
+          </div>
           <div className="space-y-6">
             <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
               Under the identity of House of Singh, Maninder has created a platform
