@@ -147,7 +147,7 @@ const About = () => {
       <section className="px-8 md:px-16 py-24 md:py-36">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-4 mb-4">
-            <img src={hosLogo} alt="House of Singh" className="w-10 h-10 object-contain opacity-60" />
+            <img src={hosLogo} alt="House of Singh" className="w-40 h-40 object-contain opacity-60" />
             <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground">
               House of Singh
             </p>
