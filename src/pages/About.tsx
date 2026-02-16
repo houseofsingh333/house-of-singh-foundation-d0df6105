@@ -151,22 +151,22 @@ const About = () => {
           </p>
           <div className="w-full h-px bg-border mb-12" />
 
-          <div className="flex justify-center mb-12">
-            <img src={hosLogo} alt="House of Singh" className="w-40 h-40 object-contain opacity-60" />
-          </div>
-          <div className="space-y-6">
-            <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
-              Under the identity of House of Singh, Maninder has created a platform
-              where design, photography, and storytelling come together to inspire
-              connection and reflection. It serves as a space to showcase an
-              evolving body of work, spanning present explorations and future
-              ventures across diverse mediums and collaborations.
-            </p>
-            <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
-              Guided by empathy and curiosity, House of Singh bridges the visual
-              and emotional, crafting narratives that celebrate beauty, purpose, and
-              meaning.
-            </p>
+          <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
+            <img src={hosLogo} alt="House of Singh" className="w-28 h-28 object-contain opacity-50 shrink-0" />
+            <div className="space-y-6">
+              <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
+                Under the identity of House of Singh, Maninder has created a platform
+                where design, photography, and storytelling come together to inspire
+                connection and reflection. It serves as a space to showcase an
+                evolving body of work, spanning present explorations and future
+                ventures across diverse mediums and collaborations.
+              </p>
+              <p className="text-sm md:text-[15px] text-muted-foreground leading-[1.8]">
+                Guided by empathy and curiosity, House of Singh bridges the visual
+                and emotional, crafting narratives that celebrate beauty, purpose, and
+                meaning.
+              </p>
+            </div>
           </div>
         </div>
       </section>
