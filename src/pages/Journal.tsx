@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { journalEntries } from "@/lib/mock-data";
 import { format } from "date-fns";
 
-const YEARS = [2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021];
+const YEARS = [2026, 2025, 2024, 2023, 2022, 2021];
 const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -42,7 +42,6 @@ const Journal = () => {
   }, []);
 
   const handleYearClick = (year: number) => {
-    if (year > currentYear) return; // future years not clickable
     if (activeYear === year) {
       setActiveYear(-1);
       return;
@@ -54,6 +53,12 @@ const Journal = () => {
       setActiveMonth(12);
     }
   };
+
+  // Compute most recent entry ID
+  const mostRecentId = useMemo(() => {
+    const sorted = [...journalEntries].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    return sorted[0]?._id;
+  }, []);
 
   const filtered = activeYear === -1
     ? []
@@ -95,30 +100,25 @@ const Journal = () => {
           <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory">
             <div className="relative min-w-max px-4">
               {/* The line */}
-              <div className="absolute top-[5px] left-0 right-0 h-px bg-border" />
+              <div className="absolute top-[5px] left-0 right-0 h-px bg-border z-0" />
 
               {/* Year markers */}
               <div className="flex items-start">
                 {YEARS.map((year, i) => {
                   const isActive = activeYear === year;
-                  const isFuture = year > currentYear;
                   return (
                     <button
                       key={year}
                       onClick={() => handleYearClick(year)}
-                      disabled={isFuture}
-                      className={`flex flex-col items-center snap-start ${
+                      className={`flex flex-col items-center snap-start group ${
                         i < YEARS.length - 1 ? "min-w-[100px] md:min-w-[140px]" : ""
-                      } ${isFuture ? "cursor-default" : "group"}`}
-                      title={isFuture ? "Coming soon" : undefined}
+                      }`}
                     >
                       {/* Dot */}
                       <div
-                        className={`rounded-full transition-all duration-300 ${
+                        className={`rounded-full transition-all duration-300 relative z-10 ${
                           isActive
                             ? "w-3 h-3 bg-foreground"
-                            : isFuture
-                            ? "w-2 h-2 bg-border/40"
                             : "w-[10px] h-[10px] bg-border group-hover:bg-foreground/50"
                         }`}
                       />
@@ -127,16 +127,11 @@ const Journal = () => {
                         className={`font-editorial text-sm md:text-base mt-3 transition-all duration-300 ${
                           isActive
                             ? "text-foreground font-medium"
-                            : isFuture
-                            ? "text-muted-foreground/20"
                             : "text-muted-foreground/40 group-hover:text-muted-foreground"
                         }`}
                       >
                         {year}
                       </span>
-                      {isFuture && (
-                        <span className="text-[8px] uppercase tracking-[0.1em] text-muted-foreground/20 mt-1">Soon</span>
-                      )}
                     </button>
                   );
                 })}
@@ -189,9 +184,6 @@ const Journal = () => {
                 ? "Select a year to browse entries"
                 : `No entries for ${MONTH_LABELS[activeMonth - 1]} ${activeYear}`}
             </p>
-            {activeYear > currentYear && (
-              <p className="text-xs text-muted-foreground/30 mt-3">New entries land here.</p>
-            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14 animate-fade-in">
@@ -206,7 +198,9 @@ const Journal = () => {
                   <img
                     src={entry.coverImage}
                     alt={entry.title || entry.excerpt}
-                    className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    className={`w-full aspect-[3/4] object-cover transition-all duration-700 group-hover:scale-[1.03] grayscale group-hover:grayscale-0 ${
+                      entry._id === mostRecentId ? "grayscale-0" : ""
+                    }`}
                     loading="lazy"
                   />
                 </div>
