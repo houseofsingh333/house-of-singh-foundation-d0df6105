@@ -14,7 +14,6 @@ const Journal = () => {
   const [activeYear, setActiveYear] = useState<number>(currentYear);
   const [activeMonth, setActiveMonth] = useState<number>(currentMonth);
 
-  // Which months have entries for a given year
   const monthsWithEntries = useMemo(() => {
     const map: Record<number, Set<number>> = {};
     journalEntries.forEach((e) => {
@@ -28,9 +27,12 @@ const Journal = () => {
   }, []);
 
   const handleYearClick = (year: number) => {
-    if (activeYear === year) return; // already open
+    if (activeYear === year) {
+      // Collapse — deselect
+      setActiveYear(-1);
+      return;
+    }
     setActiveYear(year);
-    // For current year, select current month; for past years, select December
     if (year === currentYear) {
       setActiveMonth(currentMonth);
     } else {
@@ -38,152 +40,143 @@ const Journal = () => {
     }
   };
 
-  const filtered = journalEntries.filter((e) => {
-    const d = new Date(e.publishedAt);
-    return d.getFullYear() === activeYear && d.getMonth() + 1 === activeMonth;
-  });
-
-  const heroEntry = filtered[0];
-  const gridEntries = filtered.slice(1);
+  const filtered = activeYear === -1
+    ? []
+    : journalEntries.filter((e) => {
+        const d = new Date(e.publishedAt);
+        return d.getFullYear() === activeYear && d.getMonth() + 1 === activeMonth;
+      });
 
   return (
-    <div className="px-8 md:px-16 py-16 max-w-[1400px] mx-auto">
-      {/* Page Header */}
-      <div className="mb-16">
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Archive</p>
-        <div className="w-full h-px bg-border mb-8" />
-        <h1 className="font-editorial text-5xl md:text-7xl lg:text-8xl text-foreground tracking-tight">
+    <div className="overflow-hidden">
+      {/* Page Header — consistent with About page pattern */}
+      <section className="px-8 md:px-16 pt-32 md:pt-44 pb-16 md:pb-20">
+        <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">Archive</p>
+        <div className="w-full h-px bg-border mb-10" />
+        <h1 className="font-editorial text-5xl md:text-7xl lg:text-[6rem] font-light text-foreground leading-none">
           Journal
         </h1>
-      </div>
+      </section>
 
-      {/* Timeline Navigation */}
-      <div className="mb-16 border-t border-border">
-        {YEARS.map((year) => {
-          const isOpen = activeYear === year;
-          return (
-            <div key={year} className="border-b border-border">
-              <button
-                onClick={() => handleYearClick(year)}
-                className={`w-full flex items-center justify-between py-4 transition-colors group ${
-                  isOpen ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <span className="font-editorial text-2xl md:text-3xl tracking-tight">{year}</span>
-                <span className={`text-xs uppercase tracking-[0.2em] transition-opacity ${
-                  isOpen ? "opacity-100" : "opacity-0 group-hover:opacity-50"
-                }`}>
-                  {isOpen ? "Open" : "Expand"}
-                </span>
-              </button>
+      {/* ——— Horizontal Timeline ——— */}
+      <section className="px-8 md:px-16 pb-20 md:pb-28">
+        {/* Single horizontal line with years as dots */}
+        <div className="relative">
+          {/* The line */}
+          <div className="w-full h-px bg-border" />
 
-              {/* Month Row */}
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  isOpen ? "max-h-20 opacity-100 pb-5" : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="flex flex-wrap gap-2 md:gap-3">
-                  {MONTHS.map((month) => {
-                    const isActive = activeMonth === month;
-                    const hasEntries = monthsWithEntries[year]?.has(month);
-                    // For current year, future months are faded
-                    const isFuture = year === currentYear && month > currentMonth;
+          {/* Year markers along the line */}
+          <div className="flex justify-between items-start -mt-[5px]">
+            {YEARS.map((year) => {
+              const isActive = activeYear === year;
+              return (
+                <button
+                  key={year}
+                  onClick={() => handleYearClick(year)}
+                  className="flex flex-col items-center group"
+                >
+                  {/* Dot on the line */}
+                  <div
+                    className={`w-[10px] h-[10px] rounded-full transition-all duration-300 ${
+                      isActive
+                        ? "bg-foreground scale-125"
+                        : "bg-border group-hover:bg-foreground/50"
+                    }`}
+                  />
+                  {/* Year label below */}
+                  <span
+                    className={`font-editorial text-sm md:text-base mt-3 transition-all duration-300 ${
+                      isActive
+                        ? "text-foreground"
+                        : "text-muted-foreground/40 group-hover:text-muted-foreground"
+                    }`}
+                  >
+                    {year}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-                    return (
-                      <button
-                        key={month}
-                        onClick={() => !isFuture && setActiveMonth(month)}
-                        disabled={isFuture}
-                        className={`text-xs uppercase tracking-[0.15em] px-3 py-1.5 border transition-all duration-200 ${
-                          isActive
-                            ? "bg-foreground text-background border-foreground"
-                            : isFuture
-                            ? "border-border text-muted-foreground/30 cursor-not-allowed"
-                            : hasEntries
-                            ? "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
-                            : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-muted-foreground"
-                        }`}
-                      >
-                        {MONTH_LABELS[month - 1]}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          {/* Expanded months row — slides open below active year */}
+          <div
+            className={`overflow-hidden transition-all duration-400 ease-in-out ${
+              activeYear > 0 ? "max-h-24 opacity-100 mt-8" : "max-h-0 opacity-0 mt-0"
+            }`}
+          >
+            <div className="flex items-center gap-4 md:gap-6 flex-wrap">
+              {MONTHS.map((month) => {
+                const isActive = activeMonth === month;
+                const isFuture = activeYear === currentYear && month > currentMonth;
+                const hasEntries = monthsWithEntries[activeYear]?.has(month);
+
+                return (
+                  <button
+                    key={month}
+                    onClick={() => !isFuture && setActiveMonth(month)}
+                    disabled={isFuture}
+                    className={`text-xs tracking-[0.15em] uppercase transition-all duration-200 pb-0.5 ${
+                      isActive
+                        ? "text-foreground border-b border-foreground"
+                        : isFuture
+                        ? "text-muted-foreground/20 cursor-not-allowed"
+                        : hasEntries
+                        ? "text-muted-foreground/60 hover:text-foreground border-b border-transparent hover:border-foreground"
+                        : "text-muted-foreground/30 hover:text-muted-foreground/60 border-b border-transparent"
+                    }`}
+                  >
+                    {MONTH_LABELS[month - 1]}
+                  </button>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Articles */}
-      {filtered.length === 0 ? (
-        <p className="text-muted-foreground text-sm uppercase tracking-[0.2em] text-center py-24">
-          No entries for {MONTH_LABELS[activeMonth - 1]} {activeYear}
-        </p>
-      ) : (
-        <div className="space-y-16">
-          {/* Hero Article */}
-          {heroEntry && (
-            <Link to={`/journal/${heroEntry.slug}`} className="block group">
-              <div className="overflow-hidden bg-muted mb-6">
-                <img
-                  src={heroEntry.coverImage}
-                  alt={heroEntry.title || heroEntry.excerpt}
-                  className="w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-                />
-              </div>
-              <div className="max-w-2xl">
-                {heroEntry.title && (
-                  <h2 className="text-xl md:text-2xl uppercase tracking-[0.15em] text-foreground font-light mb-3">
-                    {heroEntry.title}
+      {/* ——— Article Grid — Sjostrand-inspired ——— */}
+      <section className="px-8 md:px-16 pb-24 md:pb-36">
+        {filtered.length === 0 ? (
+          <div className="py-24 text-center">
+            <p className="text-sm text-muted-foreground/60 uppercase tracking-[0.2em]">
+              {activeYear === -1
+                ? "Select a year to browse entries"
+                : `No entries for ${MONTH_LABELS[activeMonth - 1]} ${activeYear}`}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
+            {filtered.map((entry) => (
+              <Link
+                key={entry._id}
+                to={`/journal/${entry.slug}`}
+                className="block group"
+              >
+                {/* Image */}
+                <div className="overflow-hidden bg-secondary mb-5">
+                  <img
+                    src={entry.coverImage}
+                    alt={entry.title || entry.excerpt}
+                    className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  />
+                </div>
+
+                {/* Title */}
+                {entry.title && (
+                  <h2 className="text-[11px] md:text-xs uppercase tracking-[0.15em] text-foreground font-normal leading-[1.6] mb-3">
+                    {entry.title}
                   </h2>
                 )}
-                <p className="text-muted-foreground text-sm leading-relaxed mb-3">{heroEntry.excerpt}</p>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground/70 uppercase tracking-[0.15em]">
-                    {format(new Date(heroEntry.publishedAt), "d MMMM yyyy")}
-                  </p>
-                  <span className="text-xs uppercase tracking-[0.2em] text-foreground border-b border-foreground pb-0.5 transition-opacity group-hover:opacity-70">
-                    Read more
-                  </span>
-                </div>
-              </div>
-            </Link>
-          )}
 
-          {/* Grid Articles */}
-          {gridEntries.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-14">
-              {gridEntries.map((entry) => (
-                <Link key={entry._id} to={`/journal/${entry.slug}`} className="block group">
-                  <div className="overflow-hidden bg-muted mb-4">
-                    <img
-                      src={entry.coverImage}
-                      alt={entry.title || entry.excerpt}
-                      className="w-full aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-                    />
-                  </div>
-                  {entry.title && (
-                    <h3 className="text-sm uppercase tracking-[0.15em] text-foreground font-light mb-2">
-                      {entry.title}
-                    </h3>
-                  )}
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-2">{entry.excerpt}</p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground/70 uppercase tracking-[0.15em]">
-                      {format(new Date(entry.publishedAt), "d MMMM yyyy")}
-                    </p>
-                    <span className="text-xs uppercase tracking-[0.2em] text-foreground border-b border-foreground pb-0.5 transition-opacity group-hover:opacity-70">
-                      Read more
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                {/* Read more */}
+                <span className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground group-hover:text-foreground transition-colors duration-300 border-b border-muted-foreground/30 group-hover:border-foreground pb-px">
+                  Read more
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 };

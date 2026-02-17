@@ -125,7 +125,11 @@ export const spotlightProject: SpotlightProject = {
 export const journalEntries: JournalEntry[] = [
   // 2026
   { _id: "j30", title: "Winter Stillness", slug: "winter-stillness", publishedAt: "2026-02-10T10:00:00Z", excerpt: "Silence between snowfalls, captured in monochrome.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
+  { _id: "j31", title: "The Quiet Studio", slug: "the-quiet-studio", publishedAt: "2026-02-06T10:00:00Z", excerpt: "Morning rituals and the warmth of familiar tools.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
+  { _id: "j32", title: "Portraits in February", slug: "portraits-february", publishedAt: "2026-02-03T10:00:00Z", excerpt: "Faces and stories through a winter lens.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
+  { _id: "j33", title: "Urban Geometry", slug: "urban-geometry", publishedAt: "2026-02-01T10:00:00Z", excerpt: "Lines, angles, and shadows in the city.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
   { _id: "j29", title: "New Beginnings", slug: "new-beginnings", publishedAt: "2026-01-08T10:00:00Z", excerpt: "Reflections on starting another year with intention.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
+  { _id: "j34", title: "Resolutions in Light", slug: "resolutions-light", publishedAt: "2026-01-15T10:00:00Z", excerpt: "A new year filtered through morning sun.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
   // 2025
   { _id: "j28", title: "Year's End", slug: "years-end", publishedAt: "2025-12-18T10:00:00Z", excerpt: "A quiet closing to a year of observation.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
   { _id: "j27", title: "First Snow", slug: "first-snow", publishedAt: "2025-11-22T10:00:00Z", excerpt: "The city under its first blanket of white.", body: "Full portable text body placeholder.", coverImage: "/placeholder.svg" },
