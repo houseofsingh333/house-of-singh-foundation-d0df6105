@@ -1,48 +1,41 @@
-## Journal Page Redesign
 
-A complete redesign of the Journal page combining Sjostrand Coffee's clean typography/spacing with Lyon Beton's editorial layout, plus an interactive collapsible year/month timeline at the top.
+
+## Journal Page Fixes
+
+Three changes: scrollable timeline, updated article cards, and prev/next navigation on entry pages.
 
 ---
 
-### Part 1: Collapsible Timeline Navigation
+### 1. Scrollable Timeline (supports future years)
 
-A horizontal timeline at the top of the page with years 2026 down to 2021.
+**Problem**: Fixed `flex justify-between` layout cannot accommodate new years without shrinking gaps.
 
-**Behavior:**
+**Solution**: Replace with a horizontally scrollable container using `overflow-x-auto` and fixed gap between year markers. Years remain as dots on a line, but the line scrolls if more years are added. This future-proofs for 2027, 2028, etc.
 
-- Years displayed in descending order: 2026, 2025, 2024, ... 2021
-- Clicking a year expands it to reveal months (Dec, Nov, Oct... Jan) in descending order
-- Only one year open at a time (accordion-style)
-- On page load, 2026 opens automatically with the current month (February) selected & website code showuld always show current month automatically. so when we open 2026 jan will be faded out and feb will open with its posts on the page in our ui. If we open 2025, the dec 2025 will open and other months will be greyed out but on hover it shows they are clickable.
-- When opening any past year for the first time, the most recent month (December) is pre-selected
-- Selecting a month filters the articles below to show only that month's entries
-- Clean, minimal styling using the existing editorial design system (uppercase labels, thin borders, font-editorial for years)
+- Years still rendered in descending order along a horizontal line
+- Each year marker has a fixed min-width (e.g., `min-w-[80px] md:min-w-[120px]`) so spacing stays consistent
+- Container scrolls horizontally when years exceed viewport width
+- Months order changed from descending `[12..1]` to ascending `[1..12]` (Jan to Dec)
 
-### Part 2: Article Grid (Lyon Beton layout + Sjostrand typography)
+### 2. Article Cards: Add date + short description
 
-**From Sjostrand (80%):**
+**Changes to each card in the grid:**
+- Below the image, show the published date formatted as "10 February 2026" in small muted text
+- Below the title, show the `excerpt` field (4-6 words already exist in mock data -- these serve as the short description)
+- Keep "Read more" link at the bottom
 
-- Clean uppercase article titles with generous letter-spacing
-- "Read more" link beneath each card
-- Warm, airy spacing between cards
-- Minimal text hierarchy: image, title, read more
+**Card order**: image, date, title, excerpt, "Read more"
 
-**From Lyon Beton (20%):**
+### 3. JournalEntry Page: Prev/Next Navigation
 
-- Large hero-style first article spanning full width
-- Remaining articles in a responsive 2-column grid below
-- Full-bleed cover images with generous aspect ratios
-
-**Layout structure:**
-
-- First article of the filtered results: full-width hero card with large cover image and overlaid or below title
-- Remaining articles: 2-column grid (1-column on mobile) with consistent card sizing
-- Each card: cover image (aspect 4:3 or 16:10), uppercase title, excerpt, date, "Read more" link
-
-### Part 3: Page Header
-
-- Large serif "Journal" heading (font-editorial) inspired by Lyon Beton's oversized title
-- Consistent with site's section header pattern (uppercase label + horizontal rule)
+**Changes to `src/pages/JournalEntry.tsx`:**
+- Sort all journal entries by `publishedAt` descending
+- Find the current entry's index
+- Determine previous (newer) and next (older) entries
+- Render a prev/next navigation section at the bottom of the entry, showing:
+  - Left side: previous entry title + date, linked
+  - Right side: next entry title + date, linked
+- Keep the "Back to journal" link above the prev/next section
 
 ---
 
@@ -50,20 +43,15 @@ A horizontal timeline at the top of the page with years 2026 down to 2021.
 
 **Files to modify:**
 
-1. `**src/lib/mock-data.ts**` -- Add more journal entries spanning 2021-2026 with varied months so the timeline has meaningful data to display
-2. `**src/pages/Journal.tsx**` -- Complete rewrite with:
-  - Timeline component using state for `activeYear` and `activeMonth`
-  - Year accordion using CSS transitions (max-height / overflow-hidden pattern)
-  - Month pill/button row inside each expanded year
-  - Filtered article grid below
-  - First-load logic: detect current year/month, set as defaults
-  - When a new year is clicked: auto-select December (or latest available month)
+1. **`src/pages/Journal.tsx`**
+   - Change `MONTHS` array to `[1, 2, 3, ..., 12]` (ascending, Jan to Dec)
+   - Replace the year container from `flex justify-between` to `flex gap-x-[80px] md:gap-x-[120px]` inside an `overflow-x-auto` scrollable wrapper
+   - Add date display to each article card: `format(new Date(entry.publishedAt), "d MMMM yyyy")`
+   - Add excerpt text below title in each card
 
-**State management:**
+2. **`src/pages/JournalEntry.tsx`**
+   - Sort entries by publishedAt descending, find current index
+   - Compute `prevEntry` (index - 1) and `nextEntry` (index + 1)
+   - Add a bottom navigation section with two columns: prev link (left) and next link (right), each showing entry title and formatted date
+   - Style consistently with site's editorial design (uppercase labels, muted text, font-editorial)
 
-```
-activeYear: number (default: 2026)
-activeMonth: number (default: current month for current year, 12 for past years)
-```
-
-**No new dependencies required.** Uses existing date-fns, Tailwind classes, and the project's editorial design tokens (font-editorial, tracking, spacing, border patterns).
