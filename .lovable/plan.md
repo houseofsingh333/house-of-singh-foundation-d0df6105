@@ -1,104 +1,69 @@
-# About Page Redesign
+## Journal Page Redesign
 
-A complete rebuild of the About page following the editorial guidelines provided. The page will flow through five distinct sections, with the horizontal timeline as the emotional centerpiece.
+A complete redesign of the Journal page combining Sjostrand Coffee's clean typography/spacing with Lyon Beton's editorial layout, plus an interactive collapsible year/month timeline at the top.
 
 ---
 
-## Page Structure
+### Part 1: Collapsible Timeline Navigation
 
-```text
-+------------------------------------------+
-|         Intro Quote (centered)           |
-+------------------------------------------+
-|  Founder Bio (text left, image right)    |
-+------------------------------------------+
-|   House of Singh (centered manifesto)    |
-+------------------------------------------+
-|   TEN YEARS ON (horizontal timeline)     |
-+------------------------------------------+
-|     WORDS SHARED (testimonial carousel)  |
-+------------------------------------------+
+A horizontal timeline at the top of the page with years 2026 down to 2021.
+
+**Behavior:**
+
+- Years displayed in descending order: 2026, 2025, 2024, ... 2021
+- Clicking a year expands it to reveal months (Dec, Nov, Oct... Jan) in descending order
+- Only one year open at a time (accordion-style)
+- On page load, 2026 opens automatically with the current month (February) selected & website code showuld always show current month automatically. so when we open 2026 jan will be faded out and feb will open with its posts on the page in our ui. If we open 2025, the dec 2025 will open and other months will be greyed out but on hover it shows they are clickable.
+- When opening any past year for the first time, the most recent month (December) is pre-selected
+- Selecting a month filters the articles below to show only that month's entries
+- Clean, minimal styling using the existing editorial design system (uppercase labels, thin borders, font-editorial for years)
+
+### Part 2: Article Grid (Lyon Beton layout + Sjostrand typography)
+
+**From Sjostrand (80%):**
+
+- Clean uppercase article titles with generous letter-spacing
+- "Read more" link beneath each card
+- Warm, airy spacing between cards
+- Minimal text hierarchy: image, title, read more
+
+**From Lyon Beton (20%):**
+
+- Large hero-style first article spanning full width
+- Remaining articles in a responsive 2-column grid below
+- Full-bleed cover images with generous aspect ratios
+
+**Layout structure:**
+
+- First article of the filtered results: full-width hero card with large cover image and overlaid or below title
+- Remaining articles: 2-column grid (1-column on mobile) with consistent card sizing
+- Each card: cover image (aspect 4:3 or 16:10), uppercase title, excerpt, date, "Read more" link
+
+### Part 3: Page Header
+
+- Large serif "Journal" heading (font-editorial) inspired by Lyon Beton's oversized title
+- Consistent with site's section header pattern (uppercase label + horizontal rule)
+
+---
+
+### Technical Details
+
+**Files to modify:**
+
+1. `**src/lib/mock-data.ts**` -- Add more journal entries spanning 2021-2026 with varied months so the timeline has meaningful data to display
+2. `**src/pages/Journal.tsx**` -- Complete rewrite with:
+  - Timeline component using state for `activeYear` and `activeMonth`
+  - Year accordion using CSS transitions (max-height / overflow-hidden pattern)
+  - Month pill/button row inside each expanded year
+  - Filtered article grid below
+  - First-load logic: detect current year/month, set as defaults
+  - When a new year is clicked: auto-select December (or latest available month)
+
+**State management:**
+
+```
+activeYear: number (default: 2026)
+activeMonth: number (default: current month for current year, 12 for past years)
 ```
 
----
-
-## Section 1: Intro Quote
-
-- Centered, full-width section with generous vertical padding
-- Quote in `font-editorial` serif, large size (~2rem on mobile, ~3rem on desktop)
-- "The world is filled with beauty, waiting to be seen, felt, and celebrated."
-- Subtle opacity fade-in on load using existing `editorial-fade-in` utility
-- No decorative elements around it
-
-## Section 2: Founder Section
-
-- Two-column grid: text on the left (col-span-6), portrait image on the right (col-span-5)
-- Left column contains:
-  - "MANINDER SINGH" as uppercase tracking-wide heading
-  - Three roles stacked below (Creative Director / Multidisciplinary Designer / Photographer)
-  - Two body paragraphs with the exact copy provided
-- Right column: existing portrait image (`maninder-portrait.jpg`), aspect-ratio 3:4, no animation — calm and grounded
-- Narrow max-width on text for editorial line length
-- On mobile: image stacks above text
-
-## Section 3: House of Singh Identity
-
-- Single centered narrow column (max-w-2xl), manifesto feel
-- "HOUSE OF SINGH" as uppercase tracked heading with horizontal rule
-- Two body paragraphs with the exact copy provided
-- No buttons, no CTA — purely reflective
-- Generous padding top and bottom
-
-## Section 4: Timeline — "TEN YEARS ON"
-
-This is the interactive centerpiece of the page.
-
-- Section header: "TEN YEARS ON" in the standard uppercase label + rule pattern
-- Horizontal scrollable container using CSS `overflow-x: auto` with `scroll-snap-type: x mandatory`
-- Each milestone is a card (~280px wide) with:
-  - Year as the dominant typographic element (large, font-editorial)
-  - Optional thumbnail image (muted/desaturated via grayscale filter)
-  - Short title
-  - One descriptive line
-- Cards styled archivally: no heavy borders, muted colors, bg-secondary/30 on hover
-- On mobile: horizontal swipe with snap
-- On desktop: horizontal scroll (mouse wheel or drag)
-- Built with a simple data array so future years can be added trivially
-- Initial data: 2014 (Founded House of Singh), 2018 (The Sikh Turban), 2021 (Relocation to Canada) — plus a few more placeholder milestones to fill the scroll
-
-## Section 5: Words Shared (Testimonials)
-
-- Section header: "WORDS SHARED" with the standard label + rule pattern
-- Single testimonial visible at a time, centered
-- Quote text in `font-editorial` italic/light
-- Name and optional role below
-- Left/right arrow navigation (minimal, using lucide `ChevronLeft`/`ChevronRight`)
-- No star ratings, no headshots
-- Soft typography, generous whitespace
-- Mock data with 3 placeholder testimonials
-
----
-
-## Technical Details
-
-- **File modified**: `src/pages/About.tsx` — complete rewrite of the page component
-- **No new dependencies** — timeline uses native CSS scroll-snap, testimonial uses React state for index
-- **No new files needed** — everything lives in the single About page component
-- Follows existing patterns: `font-editorial` for headings, `text-muted-foreground` for body, standard section padding (`px-8 md:px-16`, `py-24 md:py-36`), uppercase tracked labels with horizontal rules
-- The Disciplines section (currently section 4) will be removed as it's not part of the new spec
-- The old oversized name texture and pull-quote sections are replaced by the new structure  
-  
-**Conflict in technical notes**  
-You say no new files needed and everything lives in About.tsx, but earlier you describe multiple section patterns. Lovable can still do it, but it is cleaner to let it create small section components inside the same file or separate files. If you truly want one file, explicitly say keep helper components inside the same file.
-- **Do not hard reference existing assets unless confirmed**  
-`maninder-portrait.jpg` might not exist in the repo. Change that line to: use the existing portrait asset if present, otherwise create a placeholder import and I will replace it later.
-- **Disciplines removal instruction is good but add one more**  
-Tell it to remove any unused imports and dead code so build stays clean.
-- **Timeline data**  
-You listed three real milestones and said plus placeholders. Better to instruct: include the full milestone list from the existing About content if available, otherwise start with those three and keep placeholders. This prevents Lovable from inventing wrong facts.
-- **Testimonials**  
-You said exact copy earlier but you have not supplied testimonial copy yet. So keep testimonials as placeholders and add a note: final testimonials will be provided later.
-
-### Upgrade that will make it feel premium
-
-Add one sentence: timeline cards should feel like an archive strip, with subtle hover and focus states for accessibility.
+**No new dependencies required.** Uses existing date-fns, Tailwind classes, and the project's editorial design tokens (font-editorial, tracking, spacing, border patterns).
