@@ -4,7 +4,7 @@ import { journalEntries } from "@/lib/mock-data";
 import { format } from "date-fns";
 
 const YEARS = [2026, 2025, 2024, 2023, 2022, 2021];
-const MONTHS = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const currentYear = new Date().getFullYear();
@@ -60,42 +60,46 @@ const Journal = () => {
 
       {/* ——— Horizontal Timeline ——— */}
       <section className="px-8 md:px-16 pb-20 md:pb-28">
-        {/* Single horizontal line with years as dots */}
-        <div className="relative">
-          {/* The line */}
-          <div className="w-full h-px bg-border" />
+        {/* Scrollable horizontal line with year dots */}
+        <div className="relative overflow-x-auto scrollbar-hide">
+          <div className="relative min-w-max">
+            {/* The line */}
+            <div className="absolute top-[5px] left-0 right-0 h-px bg-border" />
 
-          {/* Year markers along the line */}
-          <div className="flex justify-between items-start -mt-[5px]">
-            {YEARS.map((year) => {
-              const isActive = activeYear === year;
-              return (
-                <button
-                  key={year}
-                  onClick={() => handleYearClick(year)}
-                  className="flex flex-col items-center group"
-                >
-                  {/* Dot on the line */}
-                  <div
-                    className={`w-[10px] h-[10px] rounded-full transition-all duration-300 ${
-                      isActive
-                        ? "bg-foreground scale-125"
-                        : "bg-border group-hover:bg-foreground/50"
-                    }`}
-                  />
-                  {/* Year label below */}
-                  <span
-                    className={`font-editorial text-sm md:text-base mt-3 transition-all duration-300 ${
-                      isActive
-                        ? "text-foreground"
-                        : "text-muted-foreground/40 group-hover:text-muted-foreground"
+            {/* Year markers along the line */}
+            <div className="flex items-start">
+              {YEARS.map((year, i) => {
+                const isActive = activeYear === year;
+                return (
+                  <button
+                    key={year}
+                    onClick={() => handleYearClick(year)}
+                    className={`flex flex-col items-center group ${
+                      i < YEARS.length - 1 ? "min-w-[100px] md:min-w-[140px]" : ""
                     }`}
                   >
-                    {year}
-                  </span>
-                </button>
-              );
-            })}
+                    {/* Dot on the line */}
+                    <div
+                      className={`w-[10px] h-[10px] rounded-full transition-all duration-300 ${
+                        isActive
+                          ? "bg-foreground scale-125"
+                          : "bg-border group-hover:bg-foreground/50"
+                      }`}
+                    />
+                    {/* Year label below */}
+                    <span
+                      className={`font-editorial text-sm md:text-base mt-3 transition-all duration-300 ${
+                        isActive
+                          ? "text-foreground"
+                          : "text-muted-foreground/40 group-hover:text-muted-foreground"
+                      }`}
+                    >
+                      {year}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Expanded months row — slides open below active year */}
@@ -161,12 +165,22 @@ const Journal = () => {
                   />
                 </div>
 
+                {/* Date */}
+                <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">
+                  {format(new Date(entry.publishedAt), "d MMMM yyyy")}
+                </p>
+
                 {/* Title */}
                 {entry.title && (
-                  <h2 className="text-[11px] md:text-xs uppercase tracking-[0.15em] text-foreground font-normal leading-[1.6] mb-3">
+                  <h2 className="text-[11px] md:text-xs uppercase tracking-[0.15em] text-foreground font-normal leading-[1.6] mb-2">
                     {entry.title}
                   </h2>
                 )}
+
+                {/* Excerpt */}
+                <p className="text-[11px] text-muted-foreground/70 leading-relaxed mb-3">
+                  {entry.excerpt}
+                </p>
 
                 {/* Read more */}
                 <span className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground group-hover:text-foreground transition-colors duration-300 border-b border-muted-foreground/30 group-hover:border-foreground pb-px">
