@@ -1,113 +1,120 @@
-## Journal Page and Entry Refinements
+## Journal Timeline Fixes
 
-Four changes across three files to address all feedback.
+Two quick changes to `src/pages/Journal.tsx`:
 
----
+### 1. Remove future years (2027, 2028)
 
-### 1. Scrollable Timeline with More Years
+Remove 2027 and 2028 from the `YEARS` array. The array becomes `[2026, 2025, 2024, 2023, 2022, 2021]`. The scrollable `overflow-x-auto` container remains, so future years can be added back anytime by simply appending to the array.
 
-Add years 2027 and 2028 as sample future years to demonstrate scrollability. The YEARS array becomes `[2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021]`. Future years (beyond current year) will have their dots and labels faded out, showing they exist but have no content yet. The `overflow-x-auto` container with fixed `min-w-[100px] md:min-w-[140px]` per year ensures the timeline scrolls horizontally when it overflows.
+### 2. Fix the horizontal line z-order
 
-### 2. Remove Excerpt/Subtext from Article Cards
-
-Remove the excerpt paragraph from each card in the article grid. The card structure becomes:
-
-- Image (3:4 aspect ratio)
-- Date
-- Title
-- "Read more" link
-
-No subtext/excerpt below thumbnails.
-
-### 3. JournalEntry: Previous and Next Navigation
-
-The current code already has both Previous (newer) and Next (older) navigation at the bottom. The issue is the labels -- currently "Previous" maps to newer entry and "Next" to older. This is correct chronologically (previous = before this one in the timeline = newer date, next = after this one = older date). Will verify this renders properly and both links are visible.
-
-### 4. Sample Images and Full Post Body
-
-Replace `coverImage: "/placeholder.svg"` with real Unsplash placeholder URLs for a few entries so thumbnails have actual photographs. Update one entry (e.g., "Winter Stillness") with a longer, multi-paragraph body text to demonstrate the full post reading experience.
+The timeline line currently sits above the dots because it renders before the dots in the same stacking context. Fix by moving the line behind the dots using `z-0` on the line and `z-10` (or `relative z-10`) on each dot element. This ensures dots render on top of the line visually.
 
 ---
 
 ### Technical Details
 
-**Files to modify:**
+**File: `src/pages/Journal.tsx**`
 
-1. `**src/pages/Journal.tsx**`
-  - Add 2027, 2028 to YEARS array (faded/disabled for future years)
-  - Remove excerpt `<p>` from article cards (lines 180-183)
-2. `**src/lib/mock-data.ts**`
-  - Replace `/placeholder.svg` cover images with Unsplash URLs for Feb 2026 entries (e.g., `https://images.unsplash.com/photo-...?w=800&q=80`)
-  - Expand the `body` field for "Winter Stillness" entry with 3-4 paragraphs of editorial placeholder text
-3. `**src/pages/JournalEntry.tsx**`
-  - Already has prev/next -- no structural changes needed, just confirming it works as expected  
-    
-
-    ## Timeline upgrades
-    1. Clear scroll affordance  
-    Add a subtle right edge fade overlay on the timeline container so users instantly understand it scrolls.  
-    Add a small “Scroll” hint that disappears after the first horizontal scroll.
-    2. Snap and momentum  
-    Add horizontal snap so each year lands cleanly when scrolling.  
-    Use snap x, snap mandatory, and make each year item snap start. This makes the timeline feel premium.
-    3. Active year clarity  
-    When a year is selected, add a stronger visual state: slightly larger dot, bolder label, and a thin underline or pill background.  
-    This reduces cognitive load when users scroll the page.
-    4. Future years state that looks intentional  
-    Instead of only fading future years, also disable pointer interactions and show a tiny “Coming soon” tooltip on hover.  
-    This prevents users from clicking and thinking something is broken.
-    5. Sticky timeline  
-    Make the timeline stick to the top once the user scrolls past the hero title.  
-    This keeps navigation always available while browsing entries.
-    ## Article grid upgrades
-    1. Better hover and tap feedback  
-    On hover, slightly lift the card, add a soft shadow, and very subtle image zoom.  
-    On mobile, use a pressed state on tap. It makes the grid feel responsive.
-    2. Make the whole card clickable  
-    Don’t rely on only “Read more.” Make the entire card a link, with “Read more” as a secondary affordance.  
-    This increases usability and conversion into reading.
-    3. Image loading polish  
-    Add a blurred placeholder effect for images.  
-    Even with mock data, it makes the site feel fast and editorial.
-    4. Typography hierarchy  
-    Increase date contrast slightly less than title, and limit titles to two lines with line clamp.  
-    This keeps the grid clean and consistent when titles vary.
-    5. Empty state that feels designed  
-    If a year has no posts, show a clean empty state card:  
-    “Nothing published yet” plus a short line like “New entries land here.”  
-    This pairs perfectly with the faded future years.
-    ## Filtering and discovery
-    1. Quick filters  
-    Add lightweight filters above the grid: All, Essays, Notes, Photography, Travel, Studio.  
-    Even if it is mock data now, it future proofs the UX.
-    2. Search input  
-    Add a simple search field that filters by title and body.  
-    This is the fastest perceived value upgrade for a journal.
-    3. Sort toggle  
-    Add “Newest” and “Oldest” toggle.  
-    Small control, big clarity for users who prefer chronological browsing.
-    ## Journal entry page upgrades
-    1. Progress indicator  
-    Add a slim reading progress bar at the top of the entry page.  
-    It is a tiny detail that instantly makes the reading experience feel high end.
-    2. Better prev and next clarity  
-    Keep the chronological logic exactly as you described, but improve the labels visually:  
-    Use “Newer entry” and “Older entry” as helper text under “Previous” and “Next.”  
-    This removes confusion for every user without changing your logic.
-    3. Back to journal affordance  
-    Add a “Back to Journal” link near the title, plus a floating small back button on mobile.  
-    It reduces bounce when people finish reading.
-    4. Share and copy link  
-    Add a compact share row: Copy link, Share (native if available).  
-    It encourages distribution without feeling social media heavy.
-    ## Micro interactions that elevate everything
-    1. Smooth transitions between year selection and grid update  
-    Add a subtle fade and upward motion for the grid when changing years.  
-    This makes filtering feel deliberate.
-    2. Keyboard accessibility  
-    Make year pills focusable with arrow key navigation.  
-    It is a serious quality signal for a portfolio level site.
-    3. Maintain scroll position  
-    When you click into an entry and go back, restore the user’s scroll position and selected year.  
-    This one change makes the experience feel like a real product.
-    If you want one priority order that gives maximum impact fast: make the timeline sticky with fade edges, make the whole card clickable with a premium hover, add a search field, then add reading progress on the entry page.
+- **Line 6**: Change `YEARS` from `[2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021]` to `[2026, 2025, 2024, 2023, 2022, 2021]`
+- **Line 98**: Add `z-0` to the horizontal line div
+- **Lines 116-125**: Add `relative z-10` to each dot div so they render above the line
+- Remove the `isFuture` logic branches (disabled state, "Soon" label, faded styling) since there are no future years anymore  
+  
+Refined Journal Timeline Fixes and Post Thumbnail Behavior
+  Implement the following updates so the Journal page UI is correct, the timeline renders properly, thumbnails behave as requested, and the mock data supports Previous and Next navigation testing. Also ensure Sanity can store rich text for the entry body.
+  ## A. Journal timeline fixes
+  File: `src/pages/Journal.tsx`
+  1. Remove future years  
+  Update `YEARS` to the following:
+    `[2026, 2025, 2024, 2023, 2022, 2021]`
+    Keep the horizontal scrolling container (`overflow-x-auto`) so future years can be reintroduced later by extending the array.
+  2. Fix horizontal line z order  
+  The line must render behind dots.
+    Add `z-0` to the horizontal line element.  
+    Add `relative z-10` to each dot element so dots sit above the line.
+  3. Remove all future year logic  
+  Delete any `isFuture` logic and related disabled styling, labels, or faded states since there are no future years anymore.
+  ## B. Article thumbnail styling
+  Goal: All thumbnails are black and white by default, except the most recent post, which stays in color. On hover, any thumbnail becomes color.
+  Implementation detail and expected behavior
+  1. Default state for all cards  
+  Thumbnail uses grayscale.
+  2. Most recent post  
+  Thumbnail remains color even without hover.
+  3. Hover state for any card  
+  Thumbnail becomes color on hover.
+  Recommended implementation approach in `src/pages/Journal.tsx`
+  1. Determine the most recent post  
+  Compute `mostRecentId` from your entries array using the newest date. Do not hardcode Feb 2026. This will stay correct once data comes from Sanity.
+  2. Apply conditional classes to the image element  
+  For each card image, apply Tailwind filters:
+    `grayscale` by default  
+    `group-hover:grayscale-0` on hover  
+    For the most recent post only: `grayscale-0`
+  3. Use group hover on the card  
+  Add `group` to the card wrapper so the image can respond to hover cleanly.
+  Example class logic to apply on the image
+  - Always include: `transition duration-300`
+  - Always include: `grayscale group-hover:grayscale-0`
+  - If this card is the most recent: also include `grayscale-0` and remove or override grayscale
+  This produces exactly: black and white unless newest or hovered.
+  ## C. Add more Feb 2026 posts for Previous and Next testing
+  File: `src/lib/mock-data.ts`
+  Add 2 or 3 entries in February 2026 so navigation is testable.
+  Requirements
+  1. At least 3 posts in Feb 2026  
+  Example dates: Feb 06, Feb 14, Feb 22, 2026
+  2. Ensure slugs are unique and ordered properly by date
+  3. Provide real photo thumbnails  
+  Replace `coverImage: "/placeholder.svg"` with Unsplash image URLs.
+  4. Confirm previous and next behavior in `src/pages/JournalEntry.tsx`  
+  Keep the existing logic. With 3 Feb entries, you should see both navigation links appear depending on which entry you open.
+  Important note on navigation labels  
+  Your current meaning is valid as long as your UI clarifies it:
+  - Previous points to newer
+  - Next points to older  
+  If you want to reduce confusion later, you can optionally add small helper text under each link: “Newer entry” and “Older entry” while keeping the labels.
+  ## D. Sanity CMS fields to support rich text and journal content
+  When connecting to Sanity, ensure the Journal entry document includes these fields so the CMS supports a full editorial reading experience.
+  Sanity document fields for journalEntry
+  1. title  
+  Type: string
+  2. slug  
+  Type: slug  
+  Source: title
+  3. date  
+  Type: datetime or date  
+  Use datetime if you care about time of day
+  4. coverImage  
+  Type: image  
+  Include hotspot enabled
+  5. excerpt  
+  Type: text  
+  Optional. Even if you are not showing it in the grid, it can be useful for SEO and previews.
+  6. body  
+  Type: array of blocks  
+  This is Sanity Portable Text. It supports rich text and multiple paragraphs.
+  7. tags or category  
+  Type: array of strings  
+  Optional for future filtering
+  8. isFeatured  
+  Type: boolean  
+  Optional. If you want “most recent stays color” to become “featured stays color” later, this gives you flexibility.
+  Rich text requirement  
+  The key is field 6, body, using Portable Text blocks, not a plain string.
+  ## E. Summary of files to change
+  1. `src/pages/Journal.tsx`  
+  Update YEARS array  
+  Fix z order of timeline line and dots  
+  Remove future year logic  
+  Add grayscale default and hover to color for thumbnails  
+  Keep most recent post thumbnail in color using computed newest date
+  2. `src/lib/mock-data.ts`  
+  Add 2 or 3 more Feb 2026 posts  
+  Use Unsplash image URLs for coverImage  
+  Ensure dates allow Previous and Next to show
+  3. `src/pages/JournalEntry.tsx`  
+  No structural changes required  
+  Verify Previous and Next render correctly with new Feb entries
+  If you want, paste your current `Journal.tsx` timeline section and the article card block and I will rewrite just those parts with the correct Tailwind classes and newest post detection, ready to drop in.
