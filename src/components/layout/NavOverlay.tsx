@@ -1,4 +1,5 @@
-import { X } from "lucide-react";
+import { useState } from "react";
+import { X, Sun, Moon } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { NavItem } from "@/lib/mock-data";
 
@@ -10,6 +11,15 @@ interface NavOverlayProps {
 
 const NavOverlay = ({ isOpen, onClose, items }: NavOverlayProps) => {
   const sorted = [...items].sort((a, b) => a.order - b.order);
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  );
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle("dark", next);
+  };
 
   return (
     <>
@@ -27,8 +37,8 @@ const NavOverlay = ({ isOpen, onClose, items }: NavOverlayProps) => {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Close button */}
-        <div className="flex items-center px-8 py-6">
+        {/* Close button + theme toggle */}
+        <div className="flex items-center justify-between px-8 py-6">
           <button
             onClick={onClose}
             aria-label="Close menu"
@@ -38,6 +48,14 @@ const NavOverlay = ({ isOpen, onClose, items }: NavOverlayProps) => {
             <span className="text-xs tracking-widest uppercase text-foreground">
               Close
             </span>
+          </button>
+
+          <button onClick={toggleTheme} aria-label="Toggle dark mode">
+            {isDark ? (
+              <Sun className="h-4 w-4 text-foreground" />
+            ) : (
+              <Moon className="h-4 w-4 text-foreground" />
+            )}
           </button>
         </div>
 
