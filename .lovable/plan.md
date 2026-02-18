@@ -1,120 +1,135 @@
-## Journal Timeline Fixes
 
-Two quick changes to `src/pages/Journal.tsx`:
 
-### 1. Remove future years (2027, 2028)
+## Homepage Intro + Header State Machine
 
-Remove 2027 and 2028 from the `YEARS` array. The array becomes `[2026, 2025, 2024, 2023, 2022, 2021]`. The scrollable `overflow-x-auto` container remains, so future years can be added back anytime by simply appending to the array.
-
-### 2. Fix the horizontal line z-order
-
-The timeline line currently sits above the dots because it renders before the dots in the same stacking context. Fix by moving the line behind the dots using `z-0` on the line and `z-10` (or `relative z-10`) on each dot element. This ensures dots render on top of the line visually.
+This plan creates a cinematic MP4 intro overlay, then transitions into a two-state header system controlled by scroll position.
 
 ---
 
-### Technical Details
+### Important Note on Video Path
 
-**File: `src/pages/Journal.tsx**`
+The file exists at `public/HOS Logo Animation.mp4` (project root public folder). In the browser this resolves to `/HOS Logo Animation.mp4`. The requested path `/images/HOS Logo Animation.mp4` does not exist. The implementation will use the correct path. If you later move the file to `public/images/`, the path can be updated in one place.
 
-- **Line 6**: Change `YEARS` from `[2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021]` to `[2026, 2025, 2024, 2023, 2022, 2021]`
-- **Line 98**: Add `z-0` to the horizontal line div
-- **Lines 116-125**: Add `relative z-10` to each dot div so they render above the line
-- Remove the `isFuture` logic branches (disabled state, "Soon" label, faded styling) since there are no future years anymore  
-  
-Refined Journal Timeline Fixes and Post Thumbnail Behavior
-  Implement the following updates so the Journal page UI is correct, the timeline renders properly, thumbnails behave as requested, and the mock data supports Previous and Next navigation testing. Also ensure Sanity can store rich text for the entry body.
-  ## A. Journal timeline fixes
-  File: `src/pages/Journal.tsx`
-  1. Remove future years  
-  Update `YEARS` to the following:
-    `[2026, 2025, 2024, 2023, 2022, 2021]`
-    Keep the horizontal scrolling container (`overflow-x-auto`) so future years can be reintroduced later by extending the array.
-  2. Fix horizontal line z order  
-  The line must render behind dots.
-    Add `z-0` to the horizontal line element.  
-    Add `relative z-10` to each dot element so dots sit above the line.
-  3. Remove all future year logic  
-  Delete any `isFuture` logic and related disabled styling, labels, or faded states since there are no future years anymore.
-  ## B. Article thumbnail styling
-  Goal: All thumbnails are black and white by default, except the most recent post, which stays in color. On hover, any thumbnail becomes color.
-  Implementation detail and expected behavior
-  1. Default state for all cards  
-  Thumbnail uses grayscale.
-  2. Most recent post  
-  Thumbnail remains color even without hover.
-  3. Hover state for any card  
-  Thumbnail becomes color on hover.
-  Recommended implementation approach in `src/pages/Journal.tsx`
-  1. Determine the most recent post  
-  Compute `mostRecentId` from your entries array using the newest date. Do not hardcode Feb 2026. This will stay correct once data comes from Sanity.
-  2. Apply conditional classes to the image element  
-  For each card image, apply Tailwind filters:
-    `grayscale` by default  
-    `group-hover:grayscale-0` on hover  
-    For the most recent post only: `grayscale-0`
-  3. Use group hover on the card  
-  Add `group` to the card wrapper so the image can respond to hover cleanly.
-  Example class logic to apply on the image
-  - Always include: `transition duration-300`
-  - Always include: `grayscale group-hover:grayscale-0`
-  - If this card is the most recent: also include `grayscale-0` and remove or override grayscale
-  This produces exactly: black and white unless newest or hovered.
-  ## C. Add more Feb 2026 posts for Previous and Next testing
-  File: `src/lib/mock-data.ts`
-  Add 2 or 3 entries in February 2026 so navigation is testable.
-  Requirements
-  1. At least 3 posts in Feb 2026  
-  Example dates: Feb 06, Feb 14, Feb 22, 2026
-  2. Ensure slugs are unique and ordered properly by date
-  3. Provide real photo thumbnails  
-  Replace `coverImage: "/placeholder.svg"` with Unsplash image URLs.
-  4. Confirm previous and next behavior in `src/pages/JournalEntry.tsx`  
-  Keep the existing logic. With 3 Feb entries, you should see both navigation links appear depending on which entry you open.
-  Important note on navigation labels  
-  Your current meaning is valid as long as your UI clarifies it:
-  - Previous points to newer
-  - Next points to older  
-  If you want to reduce confusion later, you can optionally add small helper text under each link: “Newer entry” and “Older entry” while keeping the labels.
-  ## D. Sanity CMS fields to support rich text and journal content
-  When connecting to Sanity, ensure the Journal entry document includes these fields so the CMS supports a full editorial reading experience.
-  Sanity document fields for journalEntry
-  1. title  
-  Type: string
-  2. slug  
-  Type: slug  
-  Source: title
-  3. date  
-  Type: datetime or date  
-  Use datetime if you care about time of day
-  4. coverImage  
-  Type: image  
-  Include hotspot enabled
-  5. excerpt  
-  Type: text  
-  Optional. Even if you are not showing it in the grid, it can be useful for SEO and previews.
-  6. body  
-  Type: array of blocks  
-  This is Sanity Portable Text. It supports rich text and multiple paragraphs.
-  7. tags or category  
-  Type: array of strings  
-  Optional for future filtering
-  8. isFeatured  
-  Type: boolean  
-  Optional. If you want “most recent stays color” to become “featured stays color” later, this gives you flexibility.
-  Rich text requirement  
-  The key is field 6, body, using Portable Text blocks, not a plain string.
-  ## E. Summary of files to change
-  1. `src/pages/Journal.tsx`  
-  Update YEARS array  
-  Fix z order of timeline line and dots  
-  Remove future year logic  
-  Add grayscale default and hover to color for thumbnails  
-  Keep most recent post thumbnail in color using computed newest date
-  2. `src/lib/mock-data.ts`  
-  Add 2 or 3 more Feb 2026 posts  
-  Use Unsplash image URLs for coverImage  
-  Ensure dates allow Previous and Next to show
-  3. `src/pages/JournalEntry.tsx`  
-  No structural changes required  
-  Verify Previous and Next render correctly with new Feb entries
-  If you want, paste your current `Journal.tsx` timeline section and the article card block and I will rewrite just those parts with the correct Tailwind classes and newest post detection, ready to drop in.
+### Important Note on Crest SVG
+
+No crest SVG file exists in the project. The implementation will use a placeholder inline SVG (a simple monogram or decorative element). You can replace it later with the actual crest asset.
+
+---
+
+### Architecture
+
+```text
+State 0 (Intro)          State 1 (Top)           State 2 (Scrolled)
++------------------+     +------------------+    +------------------+
+| White overlay    |     | [dot]  crest  [T]|    | [=====strip=====]|
+| centered video   | --> | (no background)  | -->| [dot] TEXT   [T] |
+| autoplay, muted  |     | crest = 250px    |    | h-68, blur, border|
+| onEnded: reveal  |     | 32px from top    |    |                  |
++------------------+     +------------------+    +------------------+
+  sessionStorage          scrollY < 20            scrollY >= 60
+  hos_intro_seen
+```
+
+---
+
+### Files to Create
+
+**1. `src/components/IntroOverlay.tsx`**
+
+New component. Handles the video intro and reveal.
+
+- Full-viewport fixed overlay, z-[60] (above everything)
+- Three layers: white background, centered video container, optional edge mask
+- Video element: autoplay, muted, playsInline, preload="auto", no controls
+- Video container: 480px wide on desktop, 85vw on mobile, overflow-hidden, centered
+- object-fit: cover on the video to crop excess edges
+- Edge feather: radial or box-shadow inset white gradient to blend video edges into white background
+- `onEnded` callback: triggers fade-out (opacity 0 over 500ms), then unmounts
+- Session check: reads `sessionStorage.getItem("hos_intro_seen")`. If set, component returns null immediately
+- On video end: sets `sessionStorage.setItem("hos_intro_seen", "true")`
+- Respects `prefers-reduced-motion`: if enabled, skips intro entirely
+- Calls `onComplete` prop when done to signal Layout
+
+**2. `src/components/CrestPlaceholder.tsx`**
+
+A simple inline SVG placeholder for the crest mark. Renders a decorative monogram "HOS" in an editorial style. Width controlled by prop (default 250px). This file exists solely to be swapped with the real crest asset later.
+
+---
+
+### Files to Modify
+
+**3. `src/components/layout/Header.tsx`**
+
+Complete rewrite of the header to support State 1 and State 2.
+
+New props:
+- `onMenuToggle: () => void` (existing)
+- `introComplete: boolean` -- header hidden until intro finishes
+
+State tracking:
+- `scrolled` state: boolean, updated via `useEffect` with scroll listener
+- Enter scrolled: `scrollY >= 60`
+- Exit scrolled: `scrollY <= 20`
+- Hysteresis prevents flickering
+
+State 1 (not scrolled):
+- No background strip
+- Left: dot icon (nav trigger), same position as now
+- Center: Crest SVG, 250px wide, 32px from top edge, fixed
+- Right: theme toggle icon (sun/moon)
+- All items use `fixed` positioning on same visual row
+
+State 2 (scrolled):
+- White strip: h-[68px], `bg-background/95 backdrop-blur-sm`, hairline `border-b border-border`
+- Left: dot icon (nav trigger)
+- Center: "HOUSE OF SINGH" text (uppercase, tracking-widest, small font)
+- Right: theme toggle icon
+- No "Menu" text button -- menu is only triggered by dot icon
+- Smooth transition between states (opacity + translateY)
+
+Theme toggle:
+- Simple sun/moon button that toggles `dark` class on `document.documentElement`
+- Uses lucide `Sun` and `Moon` icons
+- Minimal styling, matching the editorial aesthetic
+
+**4. `src/components/layout/NavOverlay.tsx`**
+
+Add theme toggle at the top of the overlay panel:
+- Position it in the close button row, right-aligned
+- Same sun/moon toggle as header
+- Proper aria-label: "Toggle theme"
+
+**5. `src/components/layout/Layout.tsx`**
+
+Integration changes:
+- Add `introComplete` state, default `false`
+- Check `sessionStorage` on mount -- if `hos_intro_seen` exists, set `introComplete` to `true` immediately
+- Render `IntroOverlay` conditionally (only when not yet complete)
+- Pass `onComplete` to `IntroOverlay` that sets `introComplete` to `true`
+- Pass `introComplete` to `Header` so header waits for intro to finish before showing
+- Website content (`main`, `Footer`) starts with `opacity-0` and transitions to `opacity-100` when `introComplete` becomes true (the reveal fade-in)
+
+**6. `src/index.css`**
+
+No structural changes needed. The existing `editorialFadeIn` keyframe and tailwind animate utilities cover the fade transitions.
+
+---
+
+### Behavior Summary
+
+1. User visits `/` for the first time in a session
+2. White overlay appears with centered video playing the logo animation
+3. Video ends: overlay fades out (500ms), site content fades in (500ms), `sessionStorage` flag set
+4. Header appears in State 1: crest centered, dot left, theme toggle right, no background
+5. User scrolls past 60px: header transitions to State 2 with white strip, text logo, blur
+6. User scrolls back above 20px: header returns to State 1
+7. On subsequent page loads in same session: intro skipped, site loads directly in State 1
+8. `prefers-reduced-motion`: intro skipped entirely
+
+### Accessibility
+
+- Theme toggle: `aria-label="Toggle dark mode"`
+- Dot menu: `aria-label="Open menu"` (already exists)
+- Video: no `aria` needed as it is decorative and auto-removes
+- All keyboard focusable elements maintain tab order
+
