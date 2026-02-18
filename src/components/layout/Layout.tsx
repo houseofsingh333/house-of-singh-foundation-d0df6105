@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import NavOverlay from "./NavOverlay";
@@ -8,16 +8,19 @@ import { navigation } from "@/lib/mock-data";
 
 const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [introComplete, setIntroComplete] = useState(() => {
-    return !!sessionStorage.getItem("hos_intro_seen");
-  });
+  const [introComplete, setIntroComplete] = useState(() =>
+    !!sessionStorage.getItem("hos_intro_seen")
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {!introComplete && (
         <IntroOverlay onComplete={() => setIntroComplete(true)} />
       )}
-      <Header onMenuToggle={() => setMenuOpen(true)} introComplete={introComplete} />
+      <Header
+        onMenuToggle={() => setMenuOpen(true)}
+        introComplete={introComplete}
+      />
       <NavOverlay
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}

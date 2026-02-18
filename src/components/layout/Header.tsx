@@ -57,7 +57,11 @@ const Header = ({ onMenuToggle, introComplete }: HeaderProps) => {
         </span>
 
         <button onClick={toggleTheme} aria-label="Toggle dark mode">
-          {isDark ? <Sun className="h-4 w-4 text-foreground" /> : <Moon className="h-4 w-4 text-foreground" />}
+          {isDark ? (
+            <Sun className="h-4 w-4 text-foreground" />
+          ) : (
+            <Moon className="h-4 w-4 text-foreground" />
+          )}
         </button>
       </header>
 
@@ -80,12 +84,16 @@ const Header = ({ onMenuToggle, introComplete }: HeaderProps) => {
           </button>
 
           <button onClick={toggleTheme} aria-label="Toggle dark mode">
-            {isDark ? <Sun className="h-4 w-4 text-foreground" /> : <Moon className="h-4 w-4 text-foreground" />}
+            {isDark ? (
+              <Sun className="h-4 w-4 text-foreground" />
+            ) : (
+              <Moon className="h-4 w-4 text-foreground" />
+            )}
           </button>
         </div>
 
-        {/* Crest centered */}
-        <div className="flex justify-center" style={{ marginTop: "-12px" }}>
+        {/* Crest centered, 32px from top */}
+        <div className="flex justify-center -mt-3">
           <CrestPlaceholder width={250} className="text-foreground" />
         </div>
       </div>
