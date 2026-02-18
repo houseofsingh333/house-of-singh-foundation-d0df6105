@@ -23,7 +23,7 @@ const NavOverlay = ({ isOpen, onClose, items }: NavOverlayProps) => {
 
   return (
     <>
-      {/* Right-side backdrop — lets hero show through */}
+      {/* Right-side backdrop */}
       <div
         className={`fixed inset-0 z-40 transition-opacity duration-500 ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"

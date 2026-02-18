@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface IntroOverlayProps {
   onComplete: () => void;
@@ -8,13 +8,12 @@ const IntroOverlay = ({ onComplete }: IntroOverlayProps) => {
   const [fadingOut, setFadingOut] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Check sessionStorage and prefers-reduced-motion
-  const shouldSkip = () => {
+  const shouldSkip = useCallback(() => {
     if (typeof window === "undefined") return true;
     if (sessionStorage.getItem("hos_intro_seen")) return true;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
     return false;
-  };
+  }, []);
 
   const [skip] = useState(shouldSkip);
 
@@ -55,7 +54,7 @@ const IntroOverlay = ({ onComplete }: IntroOverlayProps) => {
         >
           <source src="/HOS Logo Animation.mp4" type="video/mp4" />
         </video>
-        {/* Edge feather mask */}
+        {/* Edge feather mask to blend into background */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
