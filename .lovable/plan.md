@@ -1,120 +1,162 @@
-## Journal Timeline Fixes
 
-Two quick changes to `src/pages/Journal.tsx`:
 
-### 1. Remove future years (2027, 2028)
+## Conversational Contact Page — Typeform-Style Redesign
 
-Remove 2027 and 2028 from the `YEARS` array. The array becomes `[2026, 2025, 2024, 2023, 2022, 2021]`. The scrollable `overflow-x-auto` container remains, so future years can be added back anytime by simply appending to the array.
+A complete rebuild of the Contact page as a one-question-per-screen guided conversation with smart branching, autosave, review editing, and keyboard navigation.
 
-### 2. Fix the horizontal line z-order
+---
 
-The timeline line currently sits above the dots because it renders before the dots in the same stacking context. Fix by moving the line behind the dots using `z-0` on the line and `z-10` (or `relative z-10`) on each dot element. This ensures dots render on top of the line visually.
+### Flow Architecture
+
+The form has a dynamic number of steps depending on which intent the user selects. Every screen shows exactly one question, centered on the viewport.
+
+```text
+Step 0: "What brings you here?"
+  -> Commercial Project (6 branch questions)
+  -> Collaboration (5 branch questions)
+  -> Media / Feature (4 branch questions)
+  -> Something Else (1 freeform question)
+
+Steps 1-3: Contact details (shared across all branches)
+  1. Full Name
+  2. Email
+  3. Phone (optional, skippable)
+
+Steps 4+: Branch-specific questions (one per screen)
+
+Review Screen: Editable summary of all answers
+
+Confirmation Screen: Thank you + response timeframe
+```
+
+Total steps vary: 8-10 depending on branch.
+
+---
+
+### Visual Design (Matching Site Language)
+
+Every screen uses a single centered column layout (max-w-xl, centered vertically and horizontally). This replaces the current split-layout approach to create the Typeform "one thing at a time" feel.
+
+- **Typography**: `font-editorial` for question text at `text-3xl md:text-4xl lg:text-5xl font-light`
+- **Helper text**: `text-xs tracking-[0.2em] uppercase text-muted-foreground`
+- **Inputs**: Transparent, border-bottom-only, large text (matching existing input style from current Contact page)
+- **Choice chips**: Pill-shaped buttons with `border border-border rounded-full` -- filled on selection
+- **Transitions**: CSS `opacity` + `translateY` fade-up between steps using the existing `editorialSlideUp` animation
+- **Progress bar**: Thin 2px line at top of viewport, using foreground color, width proportional to progress
+
+---
+
+### Screen-by-Screen Breakdown
+
+**Step 0 — Intent Selection**
+- Centered question: "What brings you here?"
+- Four large tappable buttons stacked vertically, full-width on mobile, each with the option label in `text-2xl font-light`
+- Selected state: filled background, no radio dots (cleaner than current)
+
+**Steps 1-3 — Contact Details (one field per screen)**
+- Step 1: "What's your name?" + single underline input
+- Step 2: "What's your email?" + single underline input + helper "Used only to reply to you."
+- Step 3: "Your phone number?" + underline input + "Skip" button alongside Next
+
+**Steps 4+ — Branch Questions**
+Each renders one question per screen. Input types vary:
+
+| Question | Input Type |
+|----------|-----------|
+| Project name | Text input |
+| Brief description | Textarea (3 rows) |
+| Budget range | Choice chips (Under 2K / 2-5K / 5-10K / 10K+ / Not sure) |
+| Timeline | Choice chips (ASAP / 2-4 weeks / 1-2 months) + date picker option |
+| How did you hear about us | Dropdown (select) |
+| Portfolio link | Text input (optional, skippable) |
+| Social handle | Text input (optional, skippable) |
+| Media outlet name | Text input |
+| Type of inquiry | Dropdown |
+| Deadline/event date | Date picker |
+| Freeform message | Textarea |
+
+**Review Screen**
+- Clean summary grouped by section (Intent, Contact, Details)
+- Each section has an "Edit" button that jumps back to that step
+- After editing, user returns to review
+- Submit button at bottom
+
+**Confirmation Screen**
+- Centered: "Thank you -- your message has been received."
+- "We typically respond within 2 business days."
+- Subtle link: "Explore our projects" linking to /projects
+
+---
+
+### Navigation and Keyboard
+
+- **Next / Back buttons**: Bottom-right, matching current pill button style (rounded-full, uppercase tracking-widest)
+- **Enter key**: Advances to next step when field is valid
+- **Skip button**: Appears for optional fields, styled as ghost text link
+- **Progress bar**: Fixed at top, thin `h-[2px] bg-foreground` bar that transitions width smoothly
+
+---
+
+### Autosave
+
+- All form state saved to `localStorage` under key `hos-contact-draft`
+- On mount, check for existing draft and restore if found
+- Show a subtle "Draft restored" toast using the existing Sonner setup
+- Clear draft on successful submission
+- Include a small "Clear form" link on the first step if a draft exists
 
 ---
 
 ### Technical Details
 
-**File: `src/pages/Journal.tsx**`
+**File: `src/pages/Contact.tsx`** (full rewrite)
 
-- **Line 6**: Change `YEARS` from `[2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021]` to `[2026, 2025, 2024, 2023, 2022, 2021]`
-- **Line 98**: Add `z-0` to the horizontal line div
-- **Lines 116-125**: Add `relative z-10` to each dot div so they render above the line
-- Remove the `isFuture` logic branches (disabled state, "Soon" label, faded styling) since there are no future years anymore  
-  
-Refined Journal Timeline Fixes and Post Thumbnail Behavior
-  Implement the following updates so the Journal page UI is correct, the timeline renders properly, thumbnails behave as requested, and the mock data supports Previous and Next navigation testing. Also ensure Sanity can store rich text for the entry body.
-  ## A. Journal timeline fixes
-  File: `src/pages/Journal.tsx`
-  1. Remove future years  
-  Update `YEARS` to the following:
-    `[2026, 2025, 2024, 2023, 2022, 2021]`
-    Keep the horizontal scrolling container (`overflow-x-auto`) so future years can be reintroduced later by extending the array.
-  2. Fix horizontal line z order  
-  The line must render behind dots.
-    Add `z-0` to the horizontal line element.  
-    Add `relative z-10` to each dot element so dots sit above the line.
-  3. Remove all future year logic  
-  Delete any `isFuture` logic and related disabled styling, labels, or faded states since there are no future years anymore.
-  ## B. Article thumbnail styling
-  Goal: All thumbnails are black and white by default, except the most recent post, which stays in color. On hover, any thumbnail becomes color.
-  Implementation detail and expected behavior
-  1. Default state for all cards  
-  Thumbnail uses grayscale.
-  2. Most recent post  
-  Thumbnail remains color even without hover.
-  3. Hover state for any card  
-  Thumbnail becomes color on hover.
-  Recommended implementation approach in `src/pages/Journal.tsx`
-  1. Determine the most recent post  
-  Compute `mostRecentId` from your entries array using the newest date. Do not hardcode Feb 2026. This will stay correct once data comes from Sanity.
-  2. Apply conditional classes to the image element  
-  For each card image, apply Tailwind filters:
-    `grayscale` by default  
-    `group-hover:grayscale-0` on hover  
-    For the most recent post only: `grayscale-0`
-  3. Use group hover on the card  
-  Add `group` to the card wrapper so the image can respond to hover cleanly.
-  Example class logic to apply on the image
-  - Always include: `transition duration-300`
-  - Always include: `grayscale group-hover:grayscale-0`
-  - If this card is the most recent: also include `grayscale-0` and remove or override grayscale
-  This produces exactly: black and white unless newest or hovered.
-  ## C. Add more Feb 2026 posts for Previous and Next testing
-  File: `src/lib/mock-data.ts`
-  Add 2 or 3 entries in February 2026 so navigation is testable.
-  Requirements
-  1. At least 3 posts in Feb 2026  
-  Example dates: Feb 06, Feb 14, Feb 22, 2026
-  2. Ensure slugs are unique and ordered properly by date
-  3. Provide real photo thumbnails  
-  Replace `coverImage: "/placeholder.svg"` with Unsplash image URLs.
-  4. Confirm previous and next behavior in `src/pages/JournalEntry.tsx`  
-  Keep the existing logic. With 3 Feb entries, you should see both navigation links appear depending on which entry you open.
-  Important note on navigation labels  
-  Your current meaning is valid as long as your UI clarifies it:
-  - Previous points to newer
-  - Next points to older  
-  If you want to reduce confusion later, you can optionally add small helper text under each link: “Newer entry” and “Older entry” while keeping the labels.
-  ## D. Sanity CMS fields to support rich text and journal content
-  When connecting to Sanity, ensure the Journal entry document includes these fields so the CMS supports a full editorial reading experience.
-  Sanity document fields for journalEntry
-  1. title  
-  Type: string
-  2. slug  
-  Type: slug  
-  Source: title
-  3. date  
-  Type: datetime or date  
-  Use datetime if you care about time of day
-  4. coverImage  
-  Type: image  
-  Include hotspot enabled
-  5. excerpt  
-  Type: text  
-  Optional. Even if you are not showing it in the grid, it can be useful for SEO and previews.
-  6. body  
-  Type: array of blocks  
-  This is Sanity Portable Text. It supports rich text and multiple paragraphs.
-  7. tags or category  
-  Type: array of strings  
-  Optional for future filtering
-  8. isFeatured  
-  Type: boolean  
-  Optional. If you want “most recent stays color” to become “featured stays color” later, this gives you flexibility.
-  Rich text requirement  
-  The key is field 6, body, using Portable Text blocks, not a plain string.
-  ## E. Summary of files to change
-  1. `src/pages/Journal.tsx`  
-  Update YEARS array  
-  Fix z order of timeline line and dots  
-  Remove future year logic  
-  Add grayscale default and hover to color for thumbnails  
-  Keep most recent post thumbnail in color using computed newest date
-  2. `src/lib/mock-data.ts`  
-  Add 2 or 3 more Feb 2026 posts  
-  Use Unsplash image URLs for coverImage  
-  Ensure dates allow Previous and Next to show
-  3. `src/pages/JournalEntry.tsx`  
-  No structural changes required  
-  Verify Previous and Next render correctly with new Feb entries
-  If you want, paste your current `Journal.tsx` timeline section and the article card block and I will rewrite just those parts with the correct Tailwind classes and newest post detection, ready to drop in.
+The component will use:
+- `useState` for `currentStep`, `intent`, and a `formData` object with all possible fields
+- `useEffect` for localStorage autosave (debounced on formData changes)
+- `useEffect` for Enter key listener
+- `useMemo` to compute the step sequence dynamically based on selected intent
+- `useCallback` for navigation handlers
+
+**Data structure:**
+```typescript
+interface ContactFormData {
+  intent: string;
+  name: string;
+  email: string;
+  phone: string;
+  // Commercial
+  projectName: string;
+  projectDescription: string;
+  budget: string;
+  timeline: string;
+  referralSource: string;
+  // Collaboration
+  collabType: string;
+  portfolioLink: string;
+  socialHandle: string;
+  collabDescription: string;
+  collabTimeline: string;
+  // Media
+  mediaOutlet: string;
+  inquiryType: string;
+  deadline: string;
+  mediaDescription: string;
+  // Something Else
+  freeformMessage: string;
+}
+```
+
+**Step definition approach:**
+Each step is an object `{ id, question, helperText, type, field, options?, required }`. The component builds an array of steps dynamically based on `intent`, then renders one step at a time using conditional input rendering based on `type` (text, email, tel, textarea, chips, select, date).
+
+**Validation:** Only validate the currently visible field. Required fields block Next. Optional fields show Skip.
+
+**Review screen:** Maps over all completed steps, groups by section, renders label-value pairs with Edit buttons that set `currentStep` to that index and set a `returnToReview` flag so after editing it jumps back to review.
+
+**Animation:** Each step wrapper gets `key={currentStep}` and the `editorial-slide-up` class for enter animation. Steps transition with a brief opacity fade.
+
+**Responsive:** Single-column centered layout works identically on all viewports. Inputs are full-width. Choice chips wrap naturally with `flex-wrap`. Progress bar is viewport-width. Navigation buttons stack on very small screens.
+
+**No new dependencies required.** Uses existing date-fns, Sonner, and Radix popover/calendar for the date picker. All other inputs are native HTML styled with Tailwind.
+
