@@ -12,6 +12,41 @@ import { ReviewScreen, ConfirmationScreen } from "@/components/contact/ReviewCon
 
 type Phase = "form" | "review" | "done";
 
+/* ── Static left column ────────────────────────────────── */
+const EditorialSidebar = () => (
+  <div className="md:sticky md:top-24 md:self-start">
+    <h1 className="font-editorial text-5xl md:text-6xl lg:text-7xl font-light text-foreground mb-8">
+      Say hello.
+    </h1>
+    <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-4">
+      Whether it's a project, a collaboration, or simply a conversation, I'm always open to hearing from thoughtful people.
+    </p>
+    <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
+      If you'd like to catch up over coffee, go for a walk, or explore an idea together, feel free to reach out.
+    </p>
+  </div>
+);
+
+/* ── Two-column wrapper ────────────────────────────────── */
+const TwoColumnLayout = ({ children }: { children: React.ReactNode }) => (
+  <div className="min-h-[80vh] px-6 md:px-8 py-16 md:py-24">
+    <div className="grid md:grid-cols-[2fr_3fr] gap-12 md:gap-24 max-w-6xl mx-auto">
+      <EditorialSidebar />
+      <div>{children}</div>
+    </div>
+  </div>
+);
+
+/* ── Progress bar ──────────────────────────────────────── */
+const ProgressBar = ({ percent }: { percent: number }) => (
+  <div className="fixed top-0 left-0 w-full z-50">
+    <div
+      className="h-[2px] bg-foreground transition-all duration-500 ease-out"
+      style={{ width: `${percent}%` }}
+    />
+  </div>
+);
+
 const Contact = () => {
   const [formData, setFormData] = useState<ContactFormData>(() => {
     try {
@@ -29,7 +64,7 @@ const Contact = () => {
   const [returnToReview, setReturnToReview] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
 
-  // Show draft restored toast on mount
+  // Draft restored toast
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -38,7 +73,7 @@ const Contact = () => {
         if (parsed.intent || parsed.name || parsed.email) {
           setHasDraft(true);
           toast("Draft restored", {
-            description: "We saved your progress from last time.",
+            description: "I saved your progress from last time.",
             duration: 3000,
           });
         }
@@ -56,7 +91,6 @@ const Contact = () => {
   }, [formData, phase]);
 
   const steps = useMemo(() => buildSteps(formData.intent), [formData.intent]);
-
   const currentStepDef = steps[currentStep];
   const currentValue = currentStepDef ? formData[currentStepDef.field] : "";
 
@@ -77,29 +111,20 @@ const Contact = () => {
 
   const handleNext = useCallback(() => {
     if (!isValid() && !isSkippable) return;
-
-    // Auto-advance for intent selection
-    if (currentStepDef?.type === "intent" && formData[currentStepDef.field]) {
-      // Reset step to re-evaluate steps array after intent change
-    }
-
     if (returnToReview) {
       setReturnToReview(false);
       setPhase("review");
       return;
     }
-
     if (currentStep < steps.length - 1) {
       setCurrentStep((s) => s + 1);
     } else {
       setPhase("review");
     }
-  }, [isValid, isSkippable, currentStep, steps.length, returnToReview, currentStepDef, formData]);
+  }, [isValid, isSkippable, currentStep, steps.length, returnToReview]);
 
   const handlePrev = useCallback(() => {
-    if (currentStep > 0) {
-      setCurrentStep((s) => s - 1);
-    }
+    if (currentStep > 0) setCurrentStep((s) => s - 1);
   }, [currentStep]);
 
   const handleEditFromReview = useCallback((stepIndex: number) => {
@@ -124,9 +149,7 @@ const Contact = () => {
   // Auto-advance on intent selection
   useEffect(() => {
     if (currentStepDef?.type === "intent" && formData.intent) {
-      const timer = setTimeout(() => {
-        setCurrentStep((s) => s + 1);
-      }, 300);
+      const timer = setTimeout(() => setCurrentStep((s) => s + 1), 300);
       return () => clearTimeout(timer);
     }
   }, [formData.intent, currentStepDef?.type]);
@@ -145,29 +168,63 @@ const Contact = () => {
 
   // Progress
   const totalSteps = steps.length;
-  const progressPercent = phase === "review" ? 100 : phase === "done" ? 100 : ((currentStep + 1) / (totalSteps + 1)) * 100;
+  const progressPercent = phase === "review" || phase === "done" ? 100 : ((currentStep + 1) / (totalSteps + 1)) * 100;
 
-  // Confirmation
+  /* ── Navigation buttons (shared) ── */
+  const NavigationButtons = () => (
+    <div className="flex items-center justify-between pt-12">
+      <div>
+        {currentStep > 0 && (
+          <button
+            onClick={handlePrev}
+            className="flex items-center gap-2 px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground border border-border rounded-full transition-colors duration-300"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        )}
+      </div>
+      <div className="flex items-center gap-3">
+        {isSkippable && (
+          <button
+            onClick={handleNext}
+            className="px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+          >
+            Skip
+          </button>
+        )}
+        {currentStepDef?.type !== "intent" && (
+          <button
+            onClick={handleNext}
+            disabled={!isValid() && !isSkippable}
+            className="flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase bg-foreground text-background rounded-full hover:bg-foreground/90 transition-colors duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {currentStep === steps.length - 1 ? "Review" : "Next"}
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  /* ── Confirmation ── */
   if (phase === "done") {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-6">
-        <ConfirmationScreen />
-      </div>
+      <>
+        <ProgressBar percent={progressPercent} />
+        <TwoColumnLayout>
+          <ConfirmationScreen />
+        </TwoColumnLayout>
+      </>
     );
   }
 
-  // Review
+  /* ── Review ── */
   if (phase === "review") {
     return (
-      <div className="min-h-[80vh] flex flex-col px-6 py-16 md:py-24">
-        {/* Progress bar */}
-        <div className="fixed top-0 left-0 w-full z-50">
-          <div
-            className="h-[2px] bg-foreground transition-all duration-500 ease-out"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-        <div className="flex-1 flex items-start justify-center pt-8 md:pt-16">
+      <>
+        <ProgressBar percent={progressPercent} />
+        <TwoColumnLayout>
           <ReviewScreen
             steps={steps}
             formData={formData}
@@ -178,31 +235,18 @@ const Contact = () => {
               setPhase("form");
             }}
           />
-        </div>
-      </div>
+        </TwoColumnLayout>
+      </>
     );
   }
 
-  // Form steps
+  /* ── Form steps ── */
   return (
-    <div className="min-h-[80vh] flex flex-col px-6 md:px-8 py-16 md:py-24">
-      {/* Progress bar */}
-      <div className="fixed top-0 left-0 w-full z-50">
-        <div
-          className="h-[2px] bg-foreground transition-all duration-500 ease-out"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-
-      {/* Main content — centered single column */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-full max-w-xl" key={currentStep}>
-          <div className="editorial-slide-up">
-            {/* Step label */}
-            <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-6">
-              Step {currentStep + 1} of {totalSteps}
-            </p>
-
+    <>
+      <ProgressBar percent={progressPercent} />
+      <TwoColumnLayout>
+        <div className="min-h-[50vh] flex flex-col justify-center">
+          <div key={currentStep} className="editorial-slide-up">
             {/* Question */}
             <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl font-light text-foreground leading-[1.15] mb-4">
               {currentStepDef?.question}
@@ -236,45 +280,11 @@ const Contact = () => {
               </button>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between pt-8">
-        <div>
-          {currentStep > 0 && (
-            <button
-              onClick={handlePrev}
-              className="flex items-center gap-2 px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground border border-border rounded-full transition-colors duration-300"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </button>
-          )}
+          <NavigationButtons />
         </div>
-
-        <div className="flex items-center gap-3">
-          {isSkippable && (
-            <button
-              onClick={handleNext}
-              className="px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
-            >
-              Skip
-            </button>
-          )}
-          {currentStepDef?.type !== "intent" && (
-            <button
-              onClick={handleNext}
-              disabled={!isValid() && !isSkippable}
-              className="flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase bg-foreground text-background rounded-full hover:bg-foreground/90 transition-colors duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              {currentStep === steps.length - 1 ? "Review" : "Next"}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+      </TwoColumnLayout>
+    </>
   );
 };
 

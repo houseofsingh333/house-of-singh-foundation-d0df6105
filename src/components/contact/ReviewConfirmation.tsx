@@ -17,7 +17,6 @@ const sectionLabels: Record<string, string> = {
 };
 
 const ReviewScreen = ({ steps, formData, onEdit, onSubmit, onBack }: ReviewScreenProps) => {
-  // Group steps by section, skip intent (show as header instead)
   const sections = steps.reduce<Record<string, { step: StepDefinition; index: number }[]>>(
     (acc, step, i) => {
       if (!acc[step.section]) acc[step.section] = [];
@@ -31,7 +30,7 @@ const ReviewScreen = ({ steps, formData, onEdit, onSubmit, onBack }: ReviewScree
     <div className="w-full max-w-xl mx-auto editorial-slide-up">
       <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">Review</p>
       <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl font-light text-foreground mb-12">
-        Almost there.
+        Before you send.
       </h2>
 
       <div className="space-y-10">
@@ -51,7 +50,7 @@ const ReviewScreen = ({ steps, formData, onEdit, onSubmit, onBack }: ReviewScree
                   >
                     <div className="flex-1 min-w-0">
                       <span className="text-sm text-muted-foreground block mb-1">
-                        {step.question.replace("?", "")}
+                        {step.question.replace(/[?.]/g, "")}
                       </span>
                       <span className="text-base md:text-lg font-light text-foreground break-words">
                         {step.type === "date" && val
@@ -74,7 +73,6 @@ const ReviewScreen = ({ steps, formData, onEdit, onSubmit, onBack }: ReviewScree
         ))}
       </div>
 
-      {/* Actions */}
       <div className="flex items-center justify-between mt-16">
         <button
           onClick={onBack}
@@ -94,25 +92,28 @@ const ReviewScreen = ({ steps, formData, onEdit, onSubmit, onBack }: ReviewScree
   );
 };
 
-interface ConfirmationScreenProps {}
-
-const ConfirmationScreen = ({}: ConfirmationScreenProps) => (
-  <div className="w-full max-w-xl mx-auto text-center editorial-slide-up">
+const ConfirmationScreen = () => (
+  <div className="w-full max-w-xl mx-auto editorial-slide-up">
     <h1 className="font-editorial text-4xl md:text-5xl lg:text-6xl font-light text-foreground mb-6">
-      Thank you
+      Thank you for reaching out.
     </h1>
-    <p className="text-muted-foreground text-lg mb-2">
-      Your message has been received.
+    <p className="text-muted-foreground text-lg mb-12">
+      I'll be in touch shortly.
     </p>
-    <p className="text-muted-foreground text-base mb-12">
-      We typically respond within 2 business days.
-    </p>
-    <Link
-      to="/projects"
-      className="inline-flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase border border-border rounded-full text-foreground hover:bg-foreground hover:text-background transition-colors duration-300"
-    >
-      Explore our projects
-    </Link>
+    <div className="flex flex-wrap gap-4">
+      <Link
+        to="/projects"
+        className="inline-flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase border border-border rounded-full text-foreground hover:bg-foreground hover:text-background transition-colors duration-300"
+      >
+        Explore my projects
+      </Link>
+      <Link
+        to="/journal"
+        className="inline-flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase border border-border rounded-full text-foreground hover:bg-foreground hover:text-background transition-colors duration-300"
+      >
+        Read the journal
+      </Link>
+    </div>
   </div>
 );
 

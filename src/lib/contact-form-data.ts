@@ -66,7 +66,7 @@ const INTENTS = ["Commercial Project", "Collaboration", "Media / Feature", "Some
 const SHARED_CONTACT_STEPS: StepDefinition[] = [
   {
     id: "name",
-    question: "What's your name?",
+    question: "What should I call you?",
     type: "text",
     field: "name",
     required: true,
@@ -74,7 +74,7 @@ const SHARED_CONTACT_STEPS: StepDefinition[] = [
   },
   {
     id: "email",
-    question: "What's your email?",
+    question: "Where can I reach you?",
     helperText: "Used only to reply to you.",
     type: "email",
     field: "email",
@@ -83,7 +83,7 @@ const SHARED_CONTACT_STEPS: StepDefinition[] = [
   },
   {
     id: "phone",
-    question: "Your phone number?",
+    question: "A phone number, if you'd like.",
     helperText: "Optional — skip if you prefer.",
     type: "tel",
     field: "phone",
@@ -102,37 +102,37 @@ const REFERRAL_OPTIONS = [
 ];
 
 const COMMERCIAL_STEPS: StepDefinition[] = [
-  { id: "projectName", question: "What's the project called?", helperText: "A working title is fine.", type: "text", field: "projectName", required: true, section: "details" },
-  { id: "projectDescription", question: "Describe the project briefly.", helperText: "One or two sentences is enough.", type: "textarea", field: "projectDescription", required: true, section: "details" },
-  { id: "budget", question: "What's your budget range?", type: "chips", field: "budget", options: ["Under 2K", "2K – 5K", "5K – 10K", "10K+", "Not sure yet"], required: true, section: "details" },
-  { id: "timeline", question: "What's the ideal timeline?", type: "chips", field: "timeline", options: ["ASAP", "2 – 4 weeks", "1 – 2 months", "Flexible"], required: true, section: "details" },
-  { id: "referralSource", question: "How did you hear about us?", type: "select", field: "referralSource", options: REFERRAL_OPTIONS, required: true, section: "details" },
+  { id: "projectName", question: "What are you working on?", helperText: "A working title is fine.", type: "text", field: "projectName", required: true, section: "details" },
+  { id: "projectDescription", question: "Tell me a little about it.", helperText: "One or two sentences is enough.", type: "textarea", field: "projectDescription", required: true, section: "details" },
+  { id: "budget", question: "Rough budget is perfectly fine.", type: "chips", field: "budget", options: ["Under 2K", "2K – 5K", "5K – 10K", "10K+", "Not sure yet"], required: true, section: "details" },
+  { id: "timeline", question: "Any timeline in mind?", type: "chips", field: "timeline", options: ["ASAP", "2 – 4 weeks", "1 – 2 months", "Flexible"], required: true, section: "details" },
+  { id: "referralSource", question: "How did you find me?", type: "select", field: "referralSource", options: REFERRAL_OPTIONS, required: true, section: "details" },
 ];
 
 const COLLAB_STEPS: StepDefinition[] = [
-  { id: "collabType", question: "What type of collaboration?", type: "select", field: "collabType", options: ["Creative direction", "Photography", "Videography", "Brand partnership", "Event", "Other"], required: true, section: "details" },
-  { id: "portfolioLink", question: "Your portfolio or website?", helperText: "Optional — helps us learn about your work.", type: "text", field: "portfolioLink", required: false, section: "details" },
-  { id: "socialHandle", question: "Instagram or social handle?", helperText: "Optional.", type: "text", field: "socialHandle", required: false, section: "details" },
-  { id: "collabDescription", question: "Describe the collaboration idea.", type: "textarea", field: "collabDescription", required: true, section: "details" },
+  { id: "collabType", question: "What kind of collaboration interests you?", type: "select", field: "collabType", options: ["Creative direction", "Photography", "Videography", "Brand partnership", "Event", "Other"], required: true, section: "details" },
+  { id: "portfolioLink", question: "Share your work, if you'd like.", helperText: "Optional — helps me learn about your work.", type: "text", field: "portfolioLink", required: false, section: "details" },
+  { id: "socialHandle", question: "Where can I find you online?", helperText: "Optional.", type: "text", field: "socialHandle", required: false, section: "details" },
+  { id: "collabDescription", question: "Tell me about your idea.", type: "textarea", field: "collabDescription", required: true, section: "details" },
   { id: "collabTimeline", question: "Any timeline in mind?", type: "chips", field: "collabTimeline", options: ["ASAP", "2 – 4 weeks", "1 – 2 months", "Flexible"], required: false, section: "details" },
-  { id: "referralSource", question: "How did you hear about us?", type: "select", field: "referralSource", options: REFERRAL_OPTIONS, required: true, section: "details" },
+  { id: "referralSource", question: "How did you find me?", type: "select", field: "referralSource", options: REFERRAL_OPTIONS, required: true, section: "details" },
 ];
 
 const MEDIA_STEPS: StepDefinition[] = [
-  { id: "mediaOutlet", question: "Media outlet or organization?", type: "text", field: "mediaOutlet", required: true, section: "details" },
-  { id: "inquiryType", question: "Type of inquiry?", type: "select", field: "inquiryType", options: ["Interview", "Feature article", "Podcast", "Event coverage", "Press release", "Other"], required: true, section: "details" },
+  { id: "mediaOutlet", question: "Which outlet or organization?", type: "text", field: "mediaOutlet", required: true, section: "details" },
+  { id: "inquiryType", question: "What kind of inquiry is this?", type: "select", field: "inquiryType", options: ["Interview", "Feature article", "Podcast", "Event coverage", "Press release", "Other"], required: true, section: "details" },
   { id: "deadline", question: "Any deadline or event date?", helperText: "Optional.", type: "date", field: "deadline", required: false, section: "details" },
-  { id: "mediaDescription", question: "Tell us more about your request.", type: "textarea", field: "mediaDescription", required: true, section: "details" },
-  { id: "referralSource", question: "How did you hear about us?", type: "select", field: "referralSource", options: REFERRAL_OPTIONS, required: true, section: "details" },
+  { id: "mediaDescription", question: "Tell me more about your request.", type: "textarea", field: "mediaDescription", required: true, section: "details" },
+  { id: "referralSource", question: "How did you find me?", type: "select", field: "referralSource", options: REFERRAL_OPTIONS, required: true, section: "details" },
 ];
 
 const OTHER_STEPS: StepDefinition[] = [
-  { id: "freeformMessage", question: "What's on your mind?", helperText: "Tell us anything — we're listening.", type: "textarea", field: "freeformMessage", required: true, section: "details" },
+  { id: "freeformMessage", question: "What's on your mind?", helperText: "Tell me anything — I'm listening.", type: "textarea", field: "freeformMessage", required: true, section: "details" },
 ];
 
 const INTENT_STEP: StepDefinition = {
   id: "intent",
-  question: "What brings you here?",
+  question: "Tell me what brings you here.",
   type: "intent",
   field: "intent",
   options: INTENTS,
