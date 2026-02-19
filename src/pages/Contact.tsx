@@ -1,210 +1,275 @@
-import { useState } from "react";
-import { ArrowDown, ArrowLeft } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
+import {
+  type ContactFormData,
+  emptyFormData,
+  buildSteps,
+  STORAGE_KEY,
+} from "@/lib/contact-form-data";
+import StepRenderer from "@/components/contact/StepRenderer";
+import { ReviewScreen, ConfirmationScreen } from "@/components/contact/ReviewConfirmation";
 
-const steps = [
-  { label: "Your Request", description: "Start a conversation\nabout a new project\nor media inquiries." },
-  { label: "Your Information", description: "Tell us more about you.\nWhat's your name\nand email?" },
-  { label: "Your Message", description: "How can we help?\nWrite down your\nrequest here." },
-  { label: "Almost There", description: "Review and send.\nWe'll get back to you\nshortly." },
-];
-
-const reasons = ["Project Query", "Collaboration", "Media"];
+type Phase = "form" | "review" | "done";
 
 const Contact = () => {
-  const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({ name: "", email: "", reason: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState<ContactFormData>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return { ...emptyFormData, ...parsed };
+      }
+    } catch {}
+    return emptyFormData;
+  });
 
-  const canNext = () => {
-    if (step === 0) return !!formData.reason;
-    if (step === 1) return !!formData.name && !!formData.email;
-    if (step === 2) return !!formData.message;
-    return true;
-  };
+  const [currentStep, setCurrentStep] = useState(0);
+  const [phase, setPhase] = useState<Phase>("form");
+  const [returnToReview, setReturnToReview] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
 
-  const handleNext = () => {
-    if (step < steps.length - 1) setStep(step + 1);
-  };
+  // Show draft restored toast on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.intent || parsed.name || parsed.email) {
+          setHasDraft(true);
+          toast("Draft restored", {
+            description: "We saved your progress from last time.",
+            duration: 3000,
+          });
+        }
+      }
+    } catch {}
+  }, []);
 
-  const handlePrev = () => {
-    if (step > 0) setStep(step - 1);
-  };
+  // Autosave
+  useEffect(() => {
+    if (phase === "done") return;
+    const timeout = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [formData, phase]);
 
-  const handleSubmit = () => {
+  const steps = useMemo(() => buildSteps(formData.intent), [formData.intent]);
+
+  const currentStepDef = steps[currentStep];
+  const currentValue = currentStepDef ? formData[currentStepDef.field] : "";
+
+  const isValid = useCallback(() => {
+    if (!currentStepDef) return false;
+    if (!currentStepDef.required) return true;
+    return !!formData[currentStepDef.field];
+  }, [currentStepDef, formData]);
+
+  const isSkippable = currentStepDef && !currentStepDef.required;
+
+  const handleFieldChange = useCallback(
+    (field: keyof ContactFormData, value: string) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
+
+  const handleNext = useCallback(() => {
+    if (!isValid() && !isSkippable) return;
+
+    // Auto-advance for intent selection
+    if (currentStepDef?.type === "intent" && formData[currentStepDef.field]) {
+      // Reset step to re-evaluate steps array after intent change
+    }
+
+    if (returnToReview) {
+      setReturnToReview(false);
+      setPhase("review");
+      return;
+    }
+
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((s) => s + 1);
+    } else {
+      setPhase("review");
+    }
+  }, [isValid, isSkippable, currentStep, steps.length, returnToReview, currentStepDef, formData]);
+
+  const handlePrev = useCallback(() => {
+    if (currentStep > 0) {
+      setCurrentStep((s) => s - 1);
+    }
+  }, [currentStep]);
+
+  const handleEditFromReview = useCallback((stepIndex: number) => {
+    setReturnToReview(true);
+    setCurrentStep(stepIndex);
+    setPhase("form");
+  }, []);
+
+  const handleSubmit = useCallback(() => {
     console.log("Contact submission:", formData);
-    setSubmitted(true);
-  };
+    localStorage.removeItem(STORAGE_KEY);
+    setPhase("done");
+  }, [formData]);
 
-  if (submitted) {
+  const clearDraft = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setFormData(emptyFormData);
+    setCurrentStep(0);
+    setHasDraft(false);
+  }, []);
+
+  // Auto-advance on intent selection
+  useEffect(() => {
+    if (currentStepDef?.type === "intent" && formData.intent) {
+      const timer = setTimeout(() => {
+        setCurrentStep((s) => s + 1);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [formData.intent, currentStepDef?.type]);
+
+  // Keyboard: Enter to advance
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && phase === "form" && currentStepDef?.type !== "textarea" && currentStepDef?.type !== "intent") {
+        e.preventDefault();
+        if (isValid() || isSkippable) handleNext();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [phase, currentStepDef, isValid, isSkippable, handleNext]);
+
+  // Progress
+  const totalSteps = steps.length;
+  const progressPercent = phase === "review" ? 100 : phase === "done" ? 100 : ((currentStep + 1) / (totalSteps + 1)) * 100;
+
+  // Confirmation
+  if (phase === "done") {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-8 md:px-16">
-        <div className="text-center">
-          <h1 className="font-editorial text-4xl md:text-5xl lg:text-6xl font-light text-foreground mb-6">
-            Thank you
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Your message has been received. We'll be in touch soon.
-          </p>
+      <div className="min-h-[80vh] flex items-center justify-center px-6">
+        <ConfirmationScreen />
+      </div>
+    );
+  }
+
+  // Review
+  if (phase === "review") {
+    return (
+      <div className="min-h-[80vh] flex flex-col px-6 py-16 md:py-24">
+        {/* Progress bar */}
+        <div className="fixed top-0 left-0 w-full z-50">
+          <div
+            className="h-[2px] bg-foreground transition-all duration-500 ease-out"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+        <div className="flex-1 flex items-start justify-center pt-8 md:pt-16">
+          <ReviewScreen
+            steps={steps}
+            formData={formData}
+            onEdit={handleEditFromReview}
+            onSubmit={handleSubmit}
+            onBack={() => {
+              setCurrentStep(steps.length - 1);
+              setPhase("form");
+            }}
+          />
         </div>
       </div>
     );
   }
 
+  // Form steps
   return (
-    <div className="min-h-[80vh] flex flex-col px-8 md:px-16 py-16 md:py-24">
-      {/* Main content — split layout */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start pt-8 md:pt-16">
-        {/* Left — step label + description */}
-        <div>
-          <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-6">
-            {steps[step].label}
-          </p>
-          <h2 className="font-editorial text-3xl md:text-4xl lg:text-[2.75rem] font-light text-foreground leading-[1.2] whitespace-pre-line">
-            {steps[step].description}
-          </h2>
-        </div>
+    <div className="min-h-[80vh] flex flex-col px-6 md:px-8 py-16 md:py-24">
+      {/* Progress bar */}
+      <div className="fixed top-0 left-0 w-full z-50">
+        <div
+          className="h-[2px] bg-foreground transition-all duration-500 ease-out"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
 
-        {/* Right — form fields per step */}
-        <div className="flex flex-col justify-center">
-          {step === 0 && (
-            <div className="space-y-0">
-              {reasons.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setFormData({ ...formData, reason: r })}
-                  className={`w-full flex items-center gap-5 py-6 border-b border-border text-left transition-colors duration-300 group ${
-                    formData.reason === r ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <span
-                    className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors duration-300 ${
-                      formData.reason === r
-                        ? "border-foreground bg-foreground"
-                        : "border-muted-foreground/40 group-hover:border-foreground"
-                    }`}
-                  >
-                    {formData.reason === r && (
-                      <span className="w-2 h-2 rounded-full bg-background" />
-                    )}
-                  </span>
-                  <span className="text-2xl md:text-3xl font-light tracking-tight">
-                    {r}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
+      {/* Main content — centered single column */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-xl" key={currentStep}>
+          <div className="editorial-slide-up">
+            {/* Step label */}
+            <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-6">
+              Step {currentStep + 1} of {totalSteps}
+            </p>
 
-          {step === 1 && (
-            <div className="space-y-8">
-              <div>
-                <label className="block text-xs tracking-[0.2em] uppercase text-muted-foreground mb-3">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-xl md:text-2xl font-light text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground transition-colors duration-300"
-                  placeholder="Your name"
+            {/* Question */}
+            <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl font-light text-foreground leading-[1.15] mb-4">
+              {currentStepDef?.question}
+            </h2>
+
+            {/* Helper text */}
+            {currentStepDef?.helperText && (
+              <p className="text-sm text-muted-foreground mb-8">
+                {currentStepDef.helperText}
+              </p>
+            )}
+
+            {/* Input */}
+            <div className="mt-8">
+              {currentStepDef && (
+                <StepRenderer
+                  step={currentStepDef}
+                  value={currentValue}
+                  onChange={handleFieldChange}
                 />
-              </div>
-              <div>
-                <label className="block text-xs tracking-[0.2em] uppercase text-muted-foreground mb-3">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-xl md:text-2xl font-light text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground transition-colors duration-300"
-                  placeholder="your@email.com"
-                />
-              </div>
+              )}
             </div>
-          )}
 
-          {step === 2 && (
-            <div>
-              <label className="block text-xs tracking-[0.2em] uppercase text-muted-foreground mb-3">
-                Your Message
-              </label>
-              <textarea
-                required
-                rows={5}
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-xl md:text-2xl font-light text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground transition-colors duration-300 resize-none"
-                placeholder="Tell us more…"
-              />
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-6">
-              <div className="space-y-4">
-                {[
-                  { label: "Reason", value: formData.reason },
-                  { label: "Name", value: formData.name },
-                  { label: "Email", value: formData.email },
-                ].map((item) => (
-                  <div key={item.label} className="flex justify-between items-baseline border-b border-border pb-3">
-                    <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
-                      {item.label}
-                    </span>
-                    <span className="text-lg font-light text-foreground">{item.value}</span>
-                  </div>
-                ))}
-                <div className="border-b border-border pb-3">
-                  <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground block mb-2">
-                    Message
-                  </span>
-                  <p className="text-base font-light text-foreground leading-relaxed">
-                    {formData.message}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+            {/* Clear draft link on first step */}
+            {currentStep === 0 && hasDraft && (
+              <button
+                onClick={clearDraft}
+                className="mt-6 text-xs tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                Clear saved progress
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Bottom bar — step indicator + navigation */}
-      <div className="flex items-end justify-between pt-16 md:pt-24">
-        {/* Step indicator */}
-        <div className="text-7xl md:text-8xl lg:text-9xl font-light text-foreground/10 leading-none tracking-tighter select-none">
-          {step + 1}<span className="text-5xl md:text-6xl lg:text-7xl">/{steps.length}</span>
-        </div>
-
-        {/* Navigation buttons */}
-        <div className="flex items-center gap-3">
-          {step > 0 && (
+      {/* Navigation */}
+      <div className="flex items-center justify-between pt-8">
+        <div>
+          {currentStep > 0 && (
             <button
               onClick={handlePrev}
               className="flex items-center gap-2 px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground border border-border rounded-full transition-colors duration-300"
             >
               <ArrowLeft className="w-4 h-4" />
-              Prev
+              Back
             </button>
           )}
-          {step < steps.length - 1 ? (
+        </div>
+
+        <div className="flex items-center gap-3">
+          {isSkippable && (
             <button
               onClick={handleNext}
-              disabled={!canNext()}
+              className="px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              Skip
+            </button>
+          )}
+          {currentStepDef?.type !== "intent" && (
+            <button
+              onClick={handleNext}
+              disabled={!isValid() && !isSkippable}
               className="flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase bg-foreground text-background rounded-full hover:bg-foreground/90 transition-colors duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Next
-              <ArrowDown className="w-4 h-4 -rotate-90" />
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              className="flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase bg-foreground text-background rounded-full hover:bg-foreground/90 transition-colors duration-300"
-            >
-              Submit
-              <ArrowDown className="w-4 h-4 -rotate-90" />
+              {currentStep === steps.length - 1 ? "Review" : "Next"}
+              <ArrowRight className="w-4 h-4" />
             </button>
           )}
         </div>

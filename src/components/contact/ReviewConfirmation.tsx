@@ -1,0 +1,119 @@
+import { ArrowLeft, Pencil } from "lucide-react";
+import { Link } from "react-router-dom";
+import type { ContactFormData, StepDefinition } from "@/lib/contact-form-data";
+
+interface ReviewScreenProps {
+  steps: StepDefinition[];
+  formData: ContactFormData;
+  onEdit: (stepIndex: number) => void;
+  onSubmit: () => void;
+  onBack: () => void;
+}
+
+const sectionLabels: Record<string, string> = {
+  intent: "Intent",
+  contact: "Contact",
+  details: "Details",
+};
+
+const ReviewScreen = ({ steps, formData, onEdit, onSubmit, onBack }: ReviewScreenProps) => {
+  // Group steps by section, skip intent (show as header instead)
+  const sections = steps.reduce<Record<string, { step: StepDefinition; index: number }[]>>(
+    (acc, step, i) => {
+      if (!acc[step.section]) acc[step.section] = [];
+      acc[step.section].push({ step, index: i });
+      return acc;
+    },
+    {}
+  );
+
+  return (
+    <div className="w-full max-w-xl mx-auto editorial-slide-up">
+      <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">Review</p>
+      <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl font-light text-foreground mb-12">
+        Almost there.
+      </h2>
+
+      <div className="space-y-10">
+        {Object.entries(sections).map(([section, items]) => (
+          <div key={section}>
+            <h3 className="text-xs tracking-[0.25em] uppercase text-muted-foreground mb-4">
+              {sectionLabels[section] || section}
+            </h3>
+            <div className="space-y-0">
+              {items.map(({ step, index }) => {
+                const val = formData[step.field];
+                if (!val) return null;
+                return (
+                  <div
+                    key={step.id}
+                    className="flex items-baseline justify-between border-b border-border py-4 group"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-muted-foreground block mb-1">
+                        {step.question.replace("?", "")}
+                      </span>
+                      <span className="text-base md:text-lg font-light text-foreground break-words">
+                        {step.type === "date" && val
+                          ? new Date(val).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+                          : val}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => onEdit(index)}
+                      className="ml-4 text-muted-foreground hover:text-foreground transition-colors duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                      aria-label={`Edit ${step.question}`}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between mt-16">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground border border-border rounded-full transition-colors duration-300"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </button>
+        <button
+          onClick={onSubmit}
+          className="flex items-center gap-2 px-8 py-3 text-sm tracking-widest uppercase bg-foreground text-background rounded-full hover:bg-foreground/90 transition-colors duration-300"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  );
+};
+
+interface ConfirmationScreenProps {}
+
+const ConfirmationScreen = ({}: ConfirmationScreenProps) => (
+  <div className="w-full max-w-xl mx-auto text-center editorial-slide-up">
+    <h1 className="font-editorial text-4xl md:text-5xl lg:text-6xl font-light text-foreground mb-6">
+      Thank you
+    </h1>
+    <p className="text-muted-foreground text-lg mb-2">
+      Your message has been received.
+    </p>
+    <p className="text-muted-foreground text-base mb-12">
+      We typically respond within 2 business days.
+    </p>
+    <Link
+      to="/projects"
+      className="inline-flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase border border-border rounded-full text-foreground hover:bg-foreground hover:text-background transition-colors duration-300"
+    >
+      Explore our projects
+    </Link>
+  </div>
+);
+
+export { ReviewScreen, ConfirmationScreen };
