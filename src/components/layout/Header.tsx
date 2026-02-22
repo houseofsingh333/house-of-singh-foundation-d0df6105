@@ -1,4 +1,5 @@
 import { useState } from "react";
+import LanguageToggle from "@/components/LanguageToggle";
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -8,14 +9,14 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5">
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-background/95 backdrop-blur-sm">
       {/* Dot menu trigger */}
       <button
         onClick={onMenuToggle}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         aria-label="Open menu"
-        className="flex items-center gap-2 group"
+        className="flex items-center gap-2 group w-14"
       >
         <span className="block w-2.5 h-2.5 rounded-full bg-foreground" />
         <span
@@ -27,7 +28,7 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
         </span>
       </button>
 
-      {/* Centered logo */}
+      {/* Centered wordmark */}
       <a
         href="/"
         className="absolute left-1/2 -translate-x-1/2 text-sm font-medium tracking-widest uppercase text-foreground"
@@ -35,7 +36,8 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
         House of Singh
       </a>
 
-      <div className="w-10" />
+      {/* Language toggle */}
+      <LanguageToggle />
     </header>
   );
 };
