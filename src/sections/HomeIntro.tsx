@@ -31,11 +31,11 @@ const HomeIntro = () => {
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
           }`}
         >
-          <div className="w-full aspect-[4/5] overflow-hidden bg-secondary">
+          <div className="w-full aspect-[4/5] overflow-hidden bg-secondary group/photo cursor-default">
             <img
               src={portraitImage}
               alt="Maninder Singh — Creative Director, Designer & Photographer"
-              className="w-full h-full object-cover object-top"
+              className="w-full h-full object-cover object-top transition-all duration-[1.2s] ease-out grayscale-[0.15] group-hover/photo:grayscale-0 group-hover/photo:scale-[1.03]"
             />
           </div>
         </div>
