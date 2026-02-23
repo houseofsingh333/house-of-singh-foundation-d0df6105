@@ -22,21 +22,16 @@ const HomeIntro = () => {
     return () => observer.disconnect();
   }, []);
 
-  const anim = (delay: number) =>
-    `transition-all duration-700 ease-out ${
-      visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
-    }` + (delay ? ` delay-[${delay}ms]` : "");
-
   return (
     <section ref={sectionRef} className="px-8 md:px-16 py-24 md:py-36">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
-        {/* Portrait — 5 columns */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-end">
+        {/* Portrait — dominant, 7 columns, shorter aspect ratio */}
         <div
-          className={`md:col-span-5 transition-all duration-700 ease-out ${
+          className={`md:col-span-7 transition-all duration-700 ease-out ${
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
           }`}
         >
-          <div className="w-full aspect-[3/4] overflow-hidden bg-secondary">
+          <div className="w-full aspect-[4/5] overflow-hidden bg-secondary">
             <img
               src={portraitImage}
               alt="Maninder Singh — Creative Director, Designer & Photographer"
@@ -45,8 +40,8 @@ const HomeIntro = () => {
           </div>
         </div>
 
-        {/* Text — 5 columns, offset down for overlap effect */}
-        <div className="md:col-span-5 md:col-start-7 flex flex-col gap-8 md:pt-32 lg:pt-44">
+        {/* Text — 4 columns, aligned to bottom */}
+        <div className="md:col-span-4 md:col-start-9 flex flex-col gap-8 pb-2">
           <p
             className={`text-xs tracking-[0.25em] uppercase text-muted-foreground transition-all duration-700 ease-out delay-100 ${
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
@@ -60,11 +55,10 @@ const HomeIntro = () => {
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
             }`}
           >
-            {["Creative Director", "Multidisciplinary Designer", "Photographer"].map((role, i) => (
+            {["Creative Director", "Multidisciplinary Designer", "Photographer"].map((role) => (
               <p
                 key={role}
-                className="font-editorial text-xl md:text-2xl lg:text-[1.75rem] font-light text-foreground leading-[1.5]"
-                style={{ opacity: 1 - i * 0.2 }}
+                className="font-editorial text-xl md:text-2xl font-light text-foreground leading-[1.5]"
               >
                 {role}
               </p>
