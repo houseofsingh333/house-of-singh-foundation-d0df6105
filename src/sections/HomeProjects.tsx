@@ -1,11 +1,25 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { projectCategories } from "../lib/mock-data";
+import CategoryPreviewMedia from "../components/CategoryPreviewMedia";
 
-const categoryPreviews: Record<string, string> = {
-  photography: "/placeholder.svg",
-  design: "/placeholder.svg",
-  collaborations: "/placeholder.svg",
+// Sample preview data per category — swap in real GIFs/images later
+const categoryMedia: Record<string, { gifUrl?: string; images?: string[] }> = {
+  photography: {
+    images: [
+      "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
+    ],
+  },
+  design: {
+    images: [
+      "https://media.giphy.com/media/3o7btNa0RUYa5E7iiQ/giphy.gif",
+    ],
+  },
+  collaborations: {
+    images: [
+      "https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif",
+    ],
+  },
 };
 
 const HomeProjects = () => {
@@ -27,11 +41,12 @@ const HomeProjects = () => {
       </div>
       <div className="w-full h-px bg-border mb-14" />
 
-      {/* Vertical accordion strips — horizontal text */}
+      {/* Vertical accordion strips */}
       <div className="flex gap-px bg-border h-[420px] md:h-[520px] overflow-hidden">
         {projectCategories.map((cat) => {
           const isHovered = hoveredId === cat._id;
           const hasHover = hoveredId !== null;
+          const media = categoryMedia[cat.slug];
 
           return (
             <Link
@@ -45,43 +60,42 @@ const HomeProjects = () => {
               onMouseEnter={() => setHoveredId(cat._id)}
               onMouseLeave={() => setHoveredId(null)}
             >
-              {/* Background image */}
-              <div
-                className="absolute inset-0 transition-opacity duration-700"
-                style={{ opacity: isHovered ? 0.2 : 0 }}
-              >
-                <img
-                  src={categoryPreviews[cat.slug] || "/placeholder.svg"}
-                  alt=""
-                  className="w-full h-full object-cover transition-transform duration-1000"
-                  style={{ transform: isHovered ? "scale(1)" : "scale(1.1)" }}
-                />
-              </div>
-
-              {/* Collapsed — horizontal text at bottom */}
+              {/* Collapsed — title only, no numbers */}
               <div
                 className="absolute inset-0 flex flex-col items-center justify-center p-6 md:p-8 transition-opacity duration-500"
                 style={{ opacity: isHovered ? 0 : 1 }}
               >
-                <p className="text-[10px] tracking-widest text-muted-foreground/50 mb-2">
-                  {String(cat.order).padStart(2, "0")}
-                </p>
                 <p className="font-editorial text-sm md:text-base font-light text-foreground tracking-wider uppercase">
                   {cat.title}
                 </p>
+                {/* Preview media below title */}
+                {media && (
+                  <CategoryPreviewMedia
+                    title={cat.title}
+                    gifUrl={media.gifUrl}
+                    images={media.images}
+                  />
+                )}
               </div>
 
-              {/* Expanded — full info */}
+              {/* Expanded — full info, no numbers */}
               <div
                 className="absolute inset-0 flex flex-col items-center justify-center p-8 md:p-10 transition-opacity duration-500"
                 style={{ opacity: isHovered ? 1 : 0 }}
               >
-                <p className="text-[10px] tracking-widest text-muted-foreground mb-3">
-                  {String(cat.order).padStart(2, "0")}
-                </p>
                 <h3 className="font-editorial text-2xl md:text-3xl font-light text-foreground mb-4">
                   {cat.title}
                 </h3>
+                {/* Preview media in expanded state */}
+                {media && (
+                  <div className="mb-4">
+                    <CategoryPreviewMedia
+                      title={cat.title}
+                      gifUrl={media.gifUrl}
+                      images={media.images}
+                    />
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <span className="text-xs tracking-widest uppercase text-muted-foreground">
                     View
