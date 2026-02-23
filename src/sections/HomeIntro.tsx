@@ -35,7 +35,7 @@ const HomeIntro = () => {
             <img
               src={portraitImage}
               alt="Maninder Singh — Creative Director, Designer & Photographer"
-              className="w-full h-full object-cover object-top transition-all duration-[1.2s] ease-out grayscale-[0.15] group-hover/photo:grayscale-0 group-hover/photo:scale-[1.03]"
+              className="w-full h-full object-cover object-top transition-all duration-[3s] ease-out group-hover/photo:scale-[1.06]"
             />
           </div>
         </div>
@@ -71,7 +71,8 @@ const HomeIntro = () => {
             }`}
           >
             Based in Toronto, Maninder Singh crafts visual stories that sit
-            between design, photography, and culture. Through House of Singh,
+            between design, photography, and culture. Through{" "}
+            <em className="font-editorial not-italic italic">House of Singh</em>,
             his work spans brand identities, editorial narratives, and creative
             storytelling, always rooted in intention and thoughtful detail.
           </p>
