@@ -9,33 +9,9 @@ import {
 } from "@/lib/contact-form-data";
 import StepRenderer from "@/components/contact/StepRenderer";
 import { ReviewScreen, ConfirmationScreen } from "@/components/contact/ReviewConfirmation";
+import InstagramFeed from "@/components/contact/InstagramFeed";
 
 type Phase = "form" | "review" | "done";
-
-/* ── Static left column ────────────────────────────────── */
-const EditorialSidebar = () => (
-  <div className="md:sticky md:top-24 md:self-start">
-    <h1 className="font-editorial text-5xl md:text-6xl lg:text-7xl font-light text-foreground mb-8">
-      Say hello.
-    </h1>
-    <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-4">
-      Whether it's a project, a collaboration, or simply a conversation, I'm always open to hearing from thoughtful people.
-    </p>
-    <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
-      If you'd like to catch up over coffee, go for a walk, or explore an idea together, feel free to reach out.
-    </p>
-  </div>
-);
-
-/* ── Two-column wrapper ────────────────────────────────── */
-const TwoColumnLayout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-[80vh] px-6 md:px-8 py-16 md:py-24">
-    <div className="grid md:grid-cols-[2fr_3fr] gap-12 md:gap-24 max-w-6xl mx-auto">
-      <EditorialSidebar />
-      <div>{children}</div>
-    </div>
-  </div>
-);
 
 /* ── Progress bar ──────────────────────────────────────── */
 const ProgressBar = ({ percent }: { percent: number }) => (
@@ -170,25 +146,25 @@ const Contact = () => {
   const totalSteps = steps.length;
   const progressPercent = phase === "review" || phase === "done" ? 100 : ((currentStep + 1) / (totalSteps + 1)) * 100;
 
-  /* ── Navigation buttons (shared) ── */
+  /* ── Navigation buttons ── */
   const NavigationButtons = () => (
-    <div className="flex items-center justify-between pt-12">
+    <div className="flex items-center justify-between pt-16">
       <div>
         {currentStep > 0 && (
           <button
             onClick={handlePrev}
-            className="flex items-center gap-2 px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground border border-border rounded-full transition-colors duration-300"
+            className="flex items-center gap-2 text-sm tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             Back
           </button>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         {isSkippable && (
           <button
             onClick={handleNext}
-            className="px-5 py-3 text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+            className="text-sm tracking-[0.15em] uppercase text-muted-foreground/60 hover:text-muted-foreground transition-colors duration-200"
           >
             Skip
           </button>
@@ -197,93 +173,118 @@ const Contact = () => {
           <button
             onClick={handleNext}
             disabled={!isValid() && !isSkippable}
-            className="flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase bg-foreground text-background rounded-full hover:bg-foreground/90 transition-colors duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 text-sm tracking-[0.15em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-300 disabled:opacity-20 disabled:cursor-not-allowed"
           >
-            {currentStep === steps.length - 1 ? "Review" : "Next"}
-            <ArrowRight className="w-4 h-4" />
+            {currentStep === steps.length - 1 ? "Review" : "Continue"}
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
     </div>
   );
 
-  /* ── Confirmation ── */
-  if (phase === "done") {
+  /* ── Left column content ── */
+  const renderLeftColumn = () => {
+    if (phase === "done") {
+      return <ConfirmationScreen />;
+    }
+
+    if (phase === "review") {
+      return (
+        <ReviewScreen
+          steps={steps}
+          formData={formData}
+          onEdit={handleEditFromReview}
+          onSubmit={handleSubmit}
+          onBack={() => {
+            setCurrentStep(steps.length - 1);
+            setPhase("form");
+          }}
+        />
+      );
+    }
+
     return (
-      <>
-        <ProgressBar percent={progressPercent} />
-        <TwoColumnLayout>
-          <ConfirmationScreen />
-        </TwoColumnLayout>
-      </>
-    );
-  }
+      <div className="flex flex-col justify-center min-h-[60vh]">
+        {/* Editorial intro — only on first visit */}
+        <div className="mb-20">
+          <h1 className="font-editorial text-4xl md:text-5xl font-light text-foreground mb-6 leading-[1.1]">
+            Say hello.
+          </h1>
+          <div className="max-w-[32ch]">
+            <p className="text-muted-foreground text-base leading-[1.8] mb-3">
+              Whether it's a project, a collaboration, or simply a conversation, I'm always open to hearing from thoughtful people.
+            </p>
+            <p className="text-muted-foreground text-base leading-[1.8]">
+              If you'd like to catch up over coffee, go for a walk, or explore an idea together, feel free to reach out.
+            </p>
+          </div>
+        </div>
 
-  /* ── Review ── */
-  if (phase === "review") {
-    return (
-      <>
-        <ProgressBar percent={progressPercent} />
-        <TwoColumnLayout>
-          <ReviewScreen
-            steps={steps}
-            formData={formData}
-            onEdit={handleEditFromReview}
-            onSubmit={handleSubmit}
-            onBack={() => {
-              setCurrentStep(steps.length - 1);
-              setPhase("form");
-            }}
-          />
-        </TwoColumnLayout>
-      </>
-    );
-  }
+        {/* Form step */}
+        <div key={currentStep} className="editorial-slide-up">
+          <h2 className="font-editorial text-2xl md:text-3xl font-light text-foreground leading-[1.2] mb-2">
+            {currentStepDef?.question}
+          </h2>
 
-  /* ── Form steps ── */
-  return (
-    <>
-      <ProgressBar percent={progressPercent} />
-      <TwoColumnLayout>
-        <div className="min-h-[50vh] flex flex-col justify-center">
-          <div key={currentStep} className="editorial-slide-up">
-            {/* Question */}
-            <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl font-light text-foreground leading-[1.15] mb-4">
-              {currentStepDef?.question}
-            </h2>
+          {currentStepDef?.helperText && (
+            <p className="text-sm text-muted-foreground/70 mb-8">
+              {currentStepDef.helperText}
+            </p>
+          )}
 
-            {/* Helper text */}
-            {currentStepDef?.helperText && (
-              <p className="text-sm text-muted-foreground mb-8">
-                {currentStepDef.helperText}
-              </p>
-            )}
-
-            {/* Input */}
-            <div className="mt-8">
-              {currentStepDef && (
-                <StepRenderer
-                  step={currentStepDef}
-                  value={currentValue}
-                  onChange={handleFieldChange}
-                />
-              )}
-            </div>
-
-            {/* Clear draft link on first step */}
-            {currentStep === 0 && hasDraft && (
-              <button
-                onClick={clearDraft}
-                className="mt-6 text-xs tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                Clear saved progress
-              </button>
+          <div className="mt-6">
+            {currentStepDef && (
+              <StepRenderer
+                step={currentStepDef}
+                value={currentValue}
+                onChange={handleFieldChange}
+              />
             )}
           </div>
 
-          <NavigationButtons />
+          {currentStep === 0 && hasDraft && (
+            <button
+              onClick={clearDraft}
+              className="mt-8 text-xs tracking-[0.15em] uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors duration-200"
+            >
+              Clear saved progress
+            </button>
+          )}
         </div>
-      </TwoColumnLayout>
+
+        <NavigationButtons />
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <ProgressBar percent={progressPercent} />
+
+      {/* Desktop: two columns — form left, image right */}
+      <div className="min-h-[85vh] px-6 md:px-10 lg:px-16 py-16 md:py-24">
+        <div className="grid md:grid-cols-[1fr_1fr] lg:grid-cols-[5fr_4fr] gap-0 max-w-[1400px] mx-auto min-h-[70vh]">
+          {/* Left — Form */}
+          <div className="pr-0 md:pr-16 lg:pr-24">
+            {renderLeftColumn()}
+          </div>
+
+          {/* Right — Instagram feed (hidden on mobile until after form) */}
+          <div className="hidden md:block relative">
+            <div className="sticky top-24 h-[calc(100vh-8rem)] overflow-hidden">
+              <InstagramFeed />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile: image after form */}
+        <div className="block md:hidden mt-16">
+          <div className="aspect-[3/4] max-h-[480px] overflow-hidden">
+            <InstagramFeed />
+          </div>
+        </div>
+      </div>
     </>
   );
 };
